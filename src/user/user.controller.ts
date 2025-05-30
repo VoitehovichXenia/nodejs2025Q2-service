@@ -1,18 +1,42 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  HttpException,
+  HttpStatus,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './user.const';
+import { CreateUserDto, ReturnUser } from './user.const';
 
 @Controller('user')
 export class UserConroller {
   constructor(private readonly userService: UserService) {}
 
   @Get()
-  getAllUsers() {
-    return this.userService.getAll();
+  getAllUsers(): ReturnUser[] {
+    const processedUsers = this.userService
+      .getAll()
+      .map((user) => this.userService.getPublicInfo(user));
+    return processedUsers;
+  }
+
+  @Get(':id')
+  getUser(
+    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+  ): ReturnUser {
+    const user = this.userService.getById(id);
+    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    const publicUserInfo = this.userService.getPublicInfo(user);
+    return publicUserInfo;
   }
 
   @Post()
   createUser(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+    const newUser = this.userService.create(createUserDto);
+    const publicUserInfo = this.userService.getPublicInfo(newUser);
+    return publicUserInfo;
   }
 }

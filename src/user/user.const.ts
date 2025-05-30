@@ -17,3 +17,5 @@ export class CreateUserDto {
   @MinLength(6)
   password: string;
 }
+
+export type ReturnUser = Omit<User, 'password'>;
