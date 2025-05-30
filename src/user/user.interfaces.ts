@@ -18,4 +18,15 @@ export class CreateUserDto {
   password: string;
 }
 
-export type ReturnUser = Omit<User, 'password'>;
+export class UpdatePasswordDto {
+  @IsString()
+  @IsNotEmpty()
+  oldPassword: string;
+  @IsString()
+  @IsNotEmpty()
+  newPassword: string;
+}
+
+export type PublicUser = Omit<User, 'password'>;
+
+export type UpdateUserProps = UpdatePasswordDto & Pick<User, 'id'>;

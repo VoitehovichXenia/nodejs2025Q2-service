@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { User, CreateUserDto, ReturnUser } from './user.const';
+import { User, CreateUserDto, PublicUser, UpdateUserProps } from './user.const';
 
 @Injectable()
 export class UserService {
@@ -12,7 +12,7 @@ export class UserService {
     version,
     createdAt,
     updatedAt,
-  }: User): ReturnUser {
+  }: User): PublicUser {
     return { id, login, version, createdAt, updatedAt };
   }
 
@@ -42,5 +42,19 @@ export class UserService {
     const lengthBeforeDeletion = this._users.length;
     this._users = this._users.filter((user) => user.id !== id);
     return lengthBeforeDeletion > this._users.length;
+  }
+
+  public update({ newPassword, id }: UpdateUserProps): User {
+    const user = this.getById(id);
+    const userIndex = this._users.findIndex((user) => user.id === id);
+    const updatedAt = Date.now();
+    const updatedUser: User = {
+      ...user,
+      password: newPassword,
+      version: user.version + 1,
+      updatedAt,
+    };
+    this._users[userIndex] = updatedUser;
+    return updatedUser;
   }
 }
