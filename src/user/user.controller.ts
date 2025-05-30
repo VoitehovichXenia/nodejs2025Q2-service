@@ -7,6 +7,9 @@ import {
   HttpException,
   HttpStatus,
   ParseUUIDPipe,
+  Delete,
+  BadRequestException,
+  HttpCode,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, ReturnUser } from './user.const';
@@ -25,10 +28,21 @@ export class UserConroller {
 
   @Get(':id')
   getUser(
-    @Param('id', new ParseUUIDPipe({ version: '4' })) id: string,
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: () => new BadRequestException('User ID is not valid'),
+      }),
+    )
+    id: string,
   ): ReturnUser {
     const user = this.userService.getById(id);
-    if (!user) throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    if (!user)
+      throw new HttpException(
+        `User with ID ${id} was not found`,
+        HttpStatus.NOT_FOUND,
+      );
     const publicUserInfo = this.userService.getPublicInfo(user);
     return publicUserInfo;
   }
@@ -38,5 +52,25 @@ export class UserConroller {
     const newUser = this.userService.create(createUserDto);
     const publicUserInfo = this.userService.getPublicInfo(newUser);
     return publicUserInfo;
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  deleteUser(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: () => new BadRequestException('User ID is not valid'),
+      }),
+    )
+    id: string,
+  ): void {
+    const isUserDeleted = this.userService.delete(id);
+    if (!isUserDeleted)
+      throw new HttpException(
+        `User with ID ${id} was not found`,
+        HttpStatus.NOT_FOUND,
+      );
   }
 }

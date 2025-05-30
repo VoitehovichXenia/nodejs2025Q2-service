@@ -6,6 +6,16 @@ import { User, CreateUserDto, ReturnUser } from './user.const';
 export class UserService {
   private _users: User[] = [];
 
+  public getPublicInfo({
+    id,
+    login,
+    version,
+    createdAt,
+    updatedAt,
+  }: User): ReturnUser {
+    return { id, login, version, createdAt, updatedAt };
+  }
+
   public getAll(): User[] {
     return this._users;
   }
@@ -28,13 +38,9 @@ export class UserService {
     return newUser;
   }
 
-  public getPublicInfo({
-    id,
-    login,
-    version,
-    createdAt,
-    updatedAt,
-  }: User): ReturnUser {
-    return { id, login, version, createdAt, updatedAt };
+  public delete(id: string) {
+    const lengthBeforeDeletion = this._users.length;
+    this._users = this._users.filter((user) => user.id !== id);
+    return lengthBeforeDeletion > this._users.length;
   }
 }
