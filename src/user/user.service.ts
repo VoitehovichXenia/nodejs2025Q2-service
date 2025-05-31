@@ -6,13 +6,8 @@ import { User, CreateUserDto, PublicUser, UpdateUserProps } from './user.const';
 export class UserService {
   private _users: User[] = [];
 
-  public getPublicInfo({
-    id,
-    login,
-    version,
-    createdAt,
-    updatedAt,
-  }: User): PublicUser {
+  public getPublicInfo(user: User): PublicUser {
+    const { id, login, version, createdAt, updatedAt } = user;
     return { id, login, version, createdAt, updatedAt };
   }
 

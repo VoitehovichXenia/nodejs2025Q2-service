@@ -27,3 +27,5 @@ export class TrackDto {
   @IsInt()
   duration: number;
 }
+
+export type PublicTrack = Omit<Track, 'id'>;

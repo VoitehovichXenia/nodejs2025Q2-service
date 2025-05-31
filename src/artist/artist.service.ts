@@ -1,8 +1,9 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { Artist, ArtistDto } from './artist.const';
+import { Artist, ArtistDto, PublicArtist } from './artist.const';
 import { AlbumService } from 'src/album/album.service';
 import { TrackService } from 'src/track/track.service';
+import { FavoritesService } from 'src/favorite/favorite.service';
 
 @Injectable()
 export class ArtistService {
@@ -11,9 +12,16 @@ export class ArtistService {
     private readonly albumService: AlbumService,
     @Inject(forwardRef(() => TrackService))
     private readonly trackService: TrackService,
+    @Inject(forwardRef(() => FavoritesService))
+    private readonly favouritesService: FavoritesService,
   ) {}
 
   private _artists: Artist[] = [];
+
+  public getPublicInfo(artist: Artist): PublicArtist {
+    const { name, grammy } = artist;
+    return { name, grammy };
+  }
 
   public getAll(): Artist[] {
     return this._artists;
@@ -38,6 +46,7 @@ export class ArtistService {
     if (!artist) return false;
     this.albumService.deleteArtistId(id);
     this.trackService.deleteArtistId(id);
+    this.favouritesService.deleteArtist(id);
     this._artists = this._artists.filter((artist) => artist.id !== id);
     return true;
   }
