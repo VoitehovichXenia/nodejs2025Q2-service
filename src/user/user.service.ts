@@ -38,14 +38,16 @@ export class UserService {
     return newUser;
   }
 
-  public delete(id: string) {
-    const lengthBeforeDeletion = this._users.length;
+  public delete(id: string): boolean {
+    const user = this.getById(id);
+    if (!user) return false;
     this._users = this._users.filter((user) => user.id !== id);
-    return lengthBeforeDeletion > this._users.length;
+    return true;
   }
 
-  public update({ newPassword, id }: UpdateUserProps): User {
+  public update({ newPassword, id }: UpdateUserProps): User | null {
     const user = this.getById(id);
+    if (!user) return null;
     const userIndex = this._users.findIndex((user) => user.id === id);
     const updatedAt = Date.now();
     const updatedUser: User = {

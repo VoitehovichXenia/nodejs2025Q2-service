@@ -32,7 +32,8 @@ export class UserConroller {
       'id',
       new ParseUUIDPipe({
         version: '4',
-        exceptionFactory: () => new BadRequestException('User ID is not valid'),
+        exceptionFactory: () =>
+          new BadRequestException('User ID is not valid UUID'),
       }),
     )
     id: string,
@@ -57,7 +58,8 @@ export class UserConroller {
       'id',
       new ParseUUIDPipe({
         version: '4',
-        exceptionFactory: () => new BadRequestException('User ID is not valid'),
+        exceptionFactory: () =>
+          new BadRequestException('User ID is not valid UUID'),
       }),
     )
     id: string,
@@ -73,7 +75,8 @@ export class UserConroller {
       'id',
       new ParseUUIDPipe({
         version: '4',
-        exceptionFactory: () => new BadRequestException('User ID is not valid'),
+        exceptionFactory: () =>
+          new BadRequestException('User ID is not valid UUID'),
       }),
     )
     id: string,

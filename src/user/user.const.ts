@@ -12,6 +12,7 @@ export interface User {
 export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
+  @MinLength(3)
   login: string;
   @IsString()
   @MinLength(6)
