@@ -2,14 +2,14 @@ import {
   Controller,
   Get,
   Post,
+  Put,
   Body,
+  Delete,
   Param,
+  HttpCode,
   ParseUUIDPipe,
   BadRequestException,
   NotFoundException,
-  Delete,
-  HttpCode,
-  Put,
 } from '@nestjs/common';
 import { Artist, ArtistDto } from './artist.const';
 import { ArtistService } from './artist.service';
