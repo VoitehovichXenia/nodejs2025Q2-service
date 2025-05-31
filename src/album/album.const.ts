@@ -23,5 +23,3 @@ export class AlbumDto {
   @IsUUID('4', { message: 'Artist ID is not a valid UUID' })
   artistId: string | null;
 }
-
-export type PublicAlbum = Omit<Album, 'id'>;

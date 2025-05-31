@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { Album, AlbumDto, PublicAlbum } from './album.const';
+import { Album, AlbumDto } from './album.const';
 import { randomUUID } from 'crypto';
 import { ArtistService } from 'src/artist/artist.service';
 import { TrackService } from 'src/track/track.service';
@@ -18,12 +18,7 @@ export class AlbumService {
 
   private _albums: Album[] = [];
 
-  public getPublicInfo(album: Album): PublicAlbum {
-    const { name, year, artistId } = album;
-    return { name, year, artistId };
-  }
-
-  private getArtistsAlbums(artistId: string): Album[] {
+  private _getArtistsAlbums(artistId: string): Album[] {
     return this._albums.filter((album) => album.artistId === artistId);
   }
 
@@ -58,7 +53,7 @@ export class AlbumService {
   }
 
   public deleteArtistId(artistId: string): boolean {
-    const artistAlbums = this.getArtistsAlbums(artistId);
+    const artistAlbums = this._getArtistsAlbums(artistId);
     artistAlbums.forEach((album) => {
       album.artistId = null;
     });

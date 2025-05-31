@@ -13,5 +13,3 @@ export class ArtistDto {
   @IsBoolean()
   grammy: boolean;
 }
-
-export type PublicArtist = Omit<Artist, 'id'>;

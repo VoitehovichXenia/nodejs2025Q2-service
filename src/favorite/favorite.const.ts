@@ -1,15 +1,18 @@
-import { PublicAlbum } from 'src/album/album.const';
-import { PublicArtist } from 'src/artist/artist.const';
-import { PublicTrack } from 'src/track/track.const';
-
+import { Album } from 'src/album/album.const';
+import { Artist } from 'src/artist/artist.const';
+import { Track } from 'src/track/track.const';
 export interface Favorites {
   artists: string[];
   albums: string[];
   tracks: string[];
 }
 
-export interface PublicFavorites {
-  artists: PublicArtist[];
-  albums: PublicAlbum[];
-  tracks: PublicTrack[];
-}
+export type PublicFavorites = {
+  artists: Artist[];
+  albums: Album[];
+  tracks: Track[];
+};
+
+export type FavoritesCategories = keyof Favorites;
+
+export type CategoriesServices = Record<FavoritesCategories, string>;

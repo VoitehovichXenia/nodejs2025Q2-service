@@ -1,5 +1,10 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { Favorites, PublicFavorites } from './favorite.const';
+import {
+  CategoriesServices,
+  Favorites,
+  FavoritesCategories,
+  PublicFavorites,
+} from './favorite.const';
 import { TrackService } from 'src/track/track.service';
 import { AlbumService } from 'src/album/album.service';
 import { ArtistService } from 'src/artist/artist.service';
@@ -14,10 +19,17 @@ export class FavoritesService {
     @Inject(forwardRef(() => ArtistService))
     private readonly artistService: ArtistService,
   ) {}
+
   private _favs: Favorites = {
     artists: [],
     albums: [],
     tracks: [],
+  };
+
+  private _categoryServices: CategoriesServices = {
+    artists: 'artistService',
+    albums: 'albumService',
+    tracks: 'trackService',
   };
 
   public getAll(): PublicFavorites {
@@ -37,51 +49,47 @@ export class FavoritesService {
     };
   }
 
-  public addTrack(id: string): boolean {
-    const isTrackInFavs = this._favs.tracks.includes(id);
-    if (isTrackInFavs) return false;
-    const track = this.trackService.getById(id);
-    if (!track) return false;
-    this._favs.tracks.push(id);
+  private _addEntity(id: string, category: FavoritesCategories): boolean {
+    const isEntityInFavs = this._favs[category].includes(id);
+    if (isEntityInFavs) return false;
+    const serviceName = this._categoryServices[category];
+    const entity = this[serviceName].getById(id);
+    if (!entity) return false;
+    this._favs[category].push(id);
     return true;
+  }
+
+  private _deleteEntity(id: string, category: FavoritesCategories): boolean {
+    const serviceName = this._categoryServices[category];
+    const entity = this[serviceName].getById(id);
+    if (!entity) return false;
+    this._favs[category] = this._favs[category].filter(
+      (entityId) => entityId !== id,
+    );
+    return true;
+  }
+
+  public addTrack(id: string): boolean {
+    return this._addEntity(id, 'tracks');
   }
 
   public deleteTrack(id: string): boolean {
-    const track = this.trackService.getById(id);
-    if (!track) return false;
-    this._favs.tracks = this._favs.tracks.filter((trackId) => trackId !== id);
-    return true;
+    return this._deleteEntity(id, 'tracks');
   }
 
   public addAlbum(id: string): boolean {
-    const isAlbumInFavs = this._favs.albums.includes(id);
-    if (isAlbumInFavs) return false;
-    const album = this.albumService.getById(id);
-    if (!album) return false;
-    this._favs.albums.push(id);
-    return true;
+    return this._addEntity(id, 'albums');
   }
 
   public deleteAlbum(id: string): boolean {
-    const album = this.albumService.getById(id);
-    if (!album) return false;
-    this._favs.albums = this._favs.albums.filter((albumId) => albumId !== id);
-    return true;
+    return this._deleteEntity(id, 'albums');
   }
 
   public addArtist(id: string): boolean {
-    const isArtistInFavs = this._favs.artists.includes(id);
-    if (isArtistInFavs) return false;
-    const artist = this.artistService.getById(id);
-    if (!artist) return false;
-    this._favs.artists.push(id);
-    return true;
+    return this._addEntity(id, 'artists');
   }
 
   public deleteArtist(id: string): boolean {
-    const artist = this.artistService.getById(id);
-    if (!artist) return false;
-    this._favs.artists = this._favs.artists.filter((albumId) => albumId !== id);
-    return true;
+    return this._deleteEntity(id, 'artists');
   }
 }

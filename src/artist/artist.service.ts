@@ -1,6 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { randomUUID } from 'node:crypto';
-import { Artist, ArtistDto, PublicArtist } from './artist.const';
+import { Artist, ArtistDto } from './artist.const';
 import { AlbumService } from 'src/album/album.service';
 import { TrackService } from 'src/track/track.service';
 import { FavoritesService } from 'src/favorite/favorite.service';
@@ -17,11 +17,6 @@ export class ArtistService {
   ) {}
 
   private _artists: Artist[] = [];
-
-  public getPublicInfo(artist: Artist): PublicArtist {
-    const { name, grammy } = artist;
-    return { name, grammy };
-  }
 
   public getAll(): Artist[] {
     return this._artists;

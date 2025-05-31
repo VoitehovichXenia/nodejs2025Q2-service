@@ -1,5 +1,5 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { PublicTrack, Track, TrackDto } from './track.const';
+import { Track, TrackDto } from './track.const';
 import { randomUUID } from 'node:crypto';
 import { AlbumService } from 'src/album/album.service';
 import { ArtistService } from 'src/artist/artist.service';
@@ -17,17 +17,12 @@ export class TrackService {
   ) {}
   private _tracks: Track[] = [];
 
-  private getAlbumTracks(albumId: string): Track[] {
+  private _getAlbumTracks(albumId: string): Track[] {
     return this._tracks.filter((track) => track.albumId === albumId);
   }
 
-  private getArtistTracks(artistId: string): Track[] {
+  private _getArtistTracks(artistId: string): Track[] {
     return this._tracks.filter((track) => track.artistId === artistId);
-  }
-
-  public getPublicInfo(track: Track): PublicTrack {
-    const { name, albumId, artistId, duration } = track;
-    return { name, albumId, artistId, duration };
   }
 
   public getAll(): Track[] {
@@ -62,14 +57,14 @@ export class TrackService {
   }
 
   public deleteAlbumId(albumId: string) {
-    const albumTracks = this.getAlbumTracks(albumId);
+    const albumTracks = this._getAlbumTracks(albumId);
     albumTracks.forEach((track) => {
       track.albumId = null;
     });
   }
 
   public deleteArtistId(artistId: string) {
-    const artistTracks = this.getArtistTracks(artistId);
+    const artistTracks = this._getArtistTracks(artistId);
     artistTracks.forEach((track) => {
       track.artistId = null;
     });
