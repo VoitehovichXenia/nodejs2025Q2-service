@@ -14,6 +14,14 @@ export class TrackService {
   ) {}
   private _tracks: Track[] = [];
 
+  private getAlbumTracks(albumId: string): Track[] {
+    return this._tracks.filter((track) => track.albumId === albumId);
+  }
+
+  private getArtistTracks(artistId: string): Track[] {
+    return this._tracks.filter((track) => track.artistId === artistId);
+  }
+
   public getAll(): Track[] {
     return this._tracks;
   }
@@ -24,7 +32,7 @@ export class TrackService {
 
   public create({ name, albumId, artistId, duration }: TrackDto): Track | null {
     const album = albumId ? this.albumService.getById(albumId) : true;
-    const artist = artistId ? this.albumService.getById(artistId) : true;
+    const artist = artistId ? this.artistService.getById(artistId) : true;
     if (!album || !artist) return null;
     const newTrack = {
       id: randomUUID(),
@@ -44,6 +52,20 @@ export class TrackService {
     return true;
   }
 
+  public deleteAlbumId(albumId: string) {
+    const albumTracks = this.getAlbumTracks(albumId);
+    albumTracks.forEach((track) => {
+      track.albumId = null;
+    });
+  }
+
+  public deleteArtistId(artistId: string) {
+    const artistTracks = this.getArtistTracks(artistId);
+    artistTracks.forEach((track) => {
+      track.artistId = null;
+    });
+  }
+
   public update({
     id,
     albumId,
@@ -54,7 +76,7 @@ export class TrackService {
     const track = this.getById(id);
     if (!track) return null;
     const album = albumId ? this.albumService.getById(albumId) : true;
-    const artist = artistId ? this.albumService.getById(artistId) : true;
+    const artist = artistId ? this.artistService.getById(artistId) : true;
     if (!album || !artist) return null;
     const trackIndex = this._tracks.findIndex((track) => track.id === id);
     const updatedUser = {
