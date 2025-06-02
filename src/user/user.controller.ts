@@ -1,0 +1,106 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Put,
+  Body,
+  Param,
+  ParseUUIDPipe,
+  HttpCode,
+  BadRequestException,
+  ForbiddenException,
+  NotFoundException,
+  UseGuards,
+} from '@nestjs/common';
+import { UserService } from './user.service';
+import { CreateUserDto, UpdatePasswordDto, PublicUser } from './user.const';
+import { CheckHeaders } from 'src/common/checkHeaders';
+@Controller('user')
+export class UserConroller {
+  constructor(private readonly userService: UserService) {}
+
+  @Get()
+  getAllUsers(): PublicUser[] {
+    const processedUsers = this.userService
+      .getAll()
+      .map((user) => this.userService.getPublicInfo(user));
+    return processedUsers;
+  }
+
+  @Get(':id')
+  getUser(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: () =>
+          new BadRequestException('User ID is not valid UUID'),
+      }),
+    )
+    id: string,
+  ): PublicUser {
+    const user = this.userService.getById(id);
+    if (!user) throw new NotFoundException(`User with ID ${id} was not found`);
+    const publicUserInfo = this.userService.getPublicInfo(user);
+    return publicUserInfo;
+  }
+
+  @UseGuards(CheckHeaders)
+  @Post()
+  createUser(@Body() createUserDto: CreateUserDto) {
+    const newUser = this.userService.create(createUserDto);
+    const publicUserInfo = this.userService.getPublicInfo(newUser);
+    return publicUserInfo;
+  }
+
+  @Delete(':id')
+  @HttpCode(204)
+  deleteUser(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: () =>
+          new BadRequestException('User ID is not valid UUID'),
+      }),
+    )
+    id: string,
+  ): void {
+    const isUserDeleted = this.userService.delete(id);
+    if (!isUserDeleted)
+      throw new NotFoundException(`User with ID ${id} was not found`);
+  }
+
+  @UseGuards(CheckHeaders)
+  @Put(':id')
+  updateUser(
+    @Param(
+      'id',
+      new ParseUUIDPipe({
+        version: '4',
+        exceptionFactory: () =>
+          new BadRequestException('User ID is not valid UUID'),
+      }),
+    )
+    id: string,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ) {
+    const { oldPassword, newPassword } = updatePasswordDto;
+    const user = this.userService.getById(id);
+    if (!user) throw new NotFoundException(`User with ID ${id} was not found`);
+    if (oldPassword === newPassword)
+      throw new BadRequestException(
+        "New password can't be the same as old one",
+      );
+    if (user.password !== oldPassword)
+      throw new ForbiddenException('User password is incorect');
+    if (newPassword?.trim().length < 6)
+      throw new BadRequestException(
+        'Password should have at least 6 characters',
+      );
+    const updatedUser = this.userService.update({ ...updatePasswordDto, id });
+    const publicUserInfo = this.userService.getPublicInfo(updatedUser);
+    return publicUserInfo;
+  }
+}
