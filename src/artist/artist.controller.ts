@@ -81,7 +81,7 @@ export class ArtistController {
     id: string,
     @Body() updateArtistDto: ArtistDto,
   ) {
-    const updatedArtist = this.artistService.update({ id, ...updateArtistDto });
+    const updatedArtist = this.artistService.update({ ...updateArtistDto, id });
     if (!updatedArtist)
       throw new NotFoundException(`Artist with ID ${id} was not found`);
     return updatedArtist;

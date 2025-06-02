@@ -40,8 +40,8 @@ export class TrackService {
     const newTrack = {
       id: randomUUID(),
       name,
-      artistId,
-      albumId,
+      artistId: artistId ?? null,
+      albumId: albumId ?? null,
       duration,
     };
     this._tracks.push(newTrack);
@@ -85,8 +85,8 @@ export class TrackService {
     const trackIndex = this._tracks.findIndex((track) => track.id === id);
     const updatedUser = {
       id,
-      albumId,
-      artistId,
+      albumId: albumId ?? null,
+      artistId: artistId ?? null,
       name,
       duration,
     };

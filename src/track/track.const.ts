@@ -1,5 +1,6 @@
 import {
   IsInt,
+  IsOptional,
   IsString,
   IsUUID,
   MinLength,
@@ -18,10 +19,12 @@ export class TrackDto {
   @IsString()
   @MinLength(1)
   name: string;
-  @ValidateIf((track) => track.artistId !== null)
+  @IsOptional()
+  @ValidateIf((track) => track !== null)
   @IsUUID()
   artistId: string | null;
-  @ValidateIf((track) => track.albumId !== null)
+  @IsOptional()
+  @ValidateIf((track) => track !== null)
   @IsUUID()
   albumId: string | null;
   @IsInt()

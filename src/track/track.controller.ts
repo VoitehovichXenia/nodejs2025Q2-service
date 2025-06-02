@@ -86,7 +86,7 @@ export class TrackController {
     id: string,
     @Body() updateTrackDto: TrackDto,
   ): Track {
-    const updatedTrack = this.trackService.update({ id, ...updateTrackDto });
+    const updatedTrack = this.trackService.update({ ...updateTrackDto, id });
     if (!updatedTrack)
       throw new NotFoundException(
         `Check artistId and albumId, there no artists or albums with such ids`,

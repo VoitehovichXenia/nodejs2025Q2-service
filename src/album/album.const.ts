@@ -1,5 +1,7 @@
 import {
   IsInt,
+  IsOptional,
+  IsPositive,
   IsString,
   IsUUID,
   MinLength,
@@ -18,7 +20,9 @@ export class AlbumDto {
   @MinLength(1)
   name: string;
   @IsInt()
+  @IsPositive()
   year: number;
+  @IsOptional()
   @ValidateIf((album) => album.artistId !== null)
   @IsUUID('4', { message: 'Artist ID is not a valid UUID' })
   artistId: string | null;

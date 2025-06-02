@@ -86,7 +86,7 @@ export class AlbumController {
     id: string,
     @Body() updateAlbumDto: AlbumDto,
   ): Album {
-    const updatedUser = this.albumService.update({ id, ...updateAlbumDto });
+    const updatedUser = this.albumService.update({ ...updateAlbumDto, id });
     if (!updatedUser)
       throw new NotFoundException(
         `Album with ID ${id} and with artis ID ${updateAlbumDto.artistId} was not found`,

@@ -37,7 +37,7 @@ export class AlbumService {
       id: randomUUID(),
       name,
       year,
-      artistId,
+      artistId: artistId ?? null,
     };
     this._albums.push(newAlbum);
     return newAlbum;
@@ -69,7 +69,7 @@ export class AlbumService {
       id,
       name,
       year,
-      artistId,
+      artistId: artistId ?? null,
     };
     this._albums[albumIndex] = updatedAlbum;
     return updatedAlbum;
