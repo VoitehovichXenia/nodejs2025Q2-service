@@ -14,7 +14,7 @@ async function bootstrap() {
   if (yamlFile) {
     const documentFactory = () => yaml.load(yamlFile) as OpenAPIObject;
     SwaggerModule.setup('doc', app, documentFactory, {
-      yamlDocumentUrl: '../doc/api.yaml'
+      yamlDocumentUrl: '../doc/api.yaml',
     });
   }
 
