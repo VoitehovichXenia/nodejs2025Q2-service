@@ -10,9 +10,11 @@ import {
   ParseUUIDPipe,
   BadRequestException,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { Album, AlbumDto } from './album.const';
+import { CheckHeaders } from 'src/common/checkHeaders';
 
 @Controller('album')
 export class AlbumController {
@@ -41,12 +43,13 @@ export class AlbumController {
     return album;
   }
 
+  @UseGuards(CheckHeaders)
   @Post()
   createAlbum(@Body() createAlbumDto: AlbumDto): Album {
     const newAlbum = this.albumService.create(createAlbumDto);
     if (!newAlbum)
       throw new NotFoundException(
-        `Artist with ID ${createAlbumDto.artistId} doesn't exist`,
+        `Artist with artistId ${createAlbumDto.artistId} doesn't exist`,
       );
     return newAlbum;
   }
@@ -69,6 +72,7 @@ export class AlbumController {
       throw new NotFoundException(`Album with ID ${id} was not found`);
   }
 
+  @UseGuards(CheckHeaders)
   @Put(':id')
   updateAlbum(
     @Param(

@@ -11,9 +11,11 @@ import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto, UpdatePasswordDto, PublicUser } from './user.const';
+import { CheckHeaders } from 'src/common/checkHeaders';
 @Controller('user')
 export class UserConroller {
   constructor(private readonly userService: UserService) {}
@@ -44,6 +46,7 @@ export class UserConroller {
     return publicUserInfo;
   }
 
+  @UseGuards(CheckHeaders)
   @Post()
   createUser(@Body() createUserDto: CreateUserDto) {
     const newUser = this.userService.create(createUserDto);
@@ -69,6 +72,7 @@ export class UserConroller {
       throw new NotFoundException(`User with ID ${id} was not found`);
   }
 
+  @UseGuards(CheckHeaders)
   @Put(':id')
   updateUser(
     @Param(

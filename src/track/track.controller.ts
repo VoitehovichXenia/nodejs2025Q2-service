@@ -10,9 +10,11 @@ import {
   ParseUUIDPipe,
   BadRequestException,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { Track, TrackDto } from './track.const';
+import { CheckHeaders } from 'src/common/checkHeaders';
 
 @Controller('track')
 export class TrackController {
@@ -41,6 +43,7 @@ export class TrackController {
     return track;
   }
 
+  @UseGuards(CheckHeaders)
   @Post()
   createTrack(@Body() createTrackDto: TrackDto): Track {
     const newTrack = this.trackService.create(createTrackDto);
@@ -69,6 +72,7 @@ export class TrackController {
       throw new NotFoundException(`Track with ID ${id} was not found`);
   }
 
+  @UseGuards(CheckHeaders)
   @Put(':id')
   updateTrack(
     @Param(

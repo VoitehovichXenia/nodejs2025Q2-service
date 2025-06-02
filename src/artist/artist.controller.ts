@@ -10,9 +10,11 @@ import {
   ParseUUIDPipe,
   BadRequestException,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { Artist, ArtistDto } from './artist.const';
 import { ArtistService } from './artist.service';
+import { CheckHeaders } from 'src/common/checkHeaders';
 
 @Controller('artist')
 export class ArtistController {
@@ -41,6 +43,7 @@ export class ArtistController {
     return artist;
   }
 
+  @UseGuards(CheckHeaders)
   @Post()
   createArtist(@Body() createArtistDto: ArtistDto): Artist {
     return this.artistService.create(createArtistDto);
@@ -64,6 +67,7 @@ export class ArtistController {
       throw new NotFoundException(`Artist with ID ${id} was not found`);
   }
 
+  @UseGuards(CheckHeaders)
   @Put(':id')
   updateArtist(
     @Param(
