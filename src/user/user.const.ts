@@ -1,4 +1,5 @@
 import { IsString, MinLength, IsNotEmpty } from 'class-validator';
+import { IsNotBlank } from 'src/common/validators/IsNotBlank.validator';
 
 export interface User {
   id: string;
@@ -16,6 +17,7 @@ export class CreateUserDto {
   login: string;
   @IsString()
   @MinLength(6)
+  @IsNotBlank()
   password: string;
 }
 

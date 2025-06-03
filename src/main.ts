@@ -18,7 +18,13 @@ async function bootstrap() {
     });
   }
 
-  app.useGlobalPipes(new ValidationPipe());
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   const port = process.env.PORT || 4000;
   console.log(`Nest.js app is listening on http://localhost:${port}/`);
