@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
 import { Album, AlbumDto } from './album.const';
-import { CheckHeaders } from 'src/common/checkHeaders';
+import { CheckHeaders } from 'src/common/guards/headers.guard';
 
 @Controller('album')
 export class AlbumController {
@@ -86,11 +86,11 @@ export class AlbumController {
     id: string,
     @Body() updateAlbumDto: AlbumDto,
   ): Album {
-    const updatedUser = this.albumService.update({ ...updateAlbumDto, id });
-    if (!updatedUser)
+    const updatedAlbum = this.albumService.update({ ...updateAlbumDto, id });
+    if (!updatedAlbum)
       throw new NotFoundException(
         `Album with ID ${id} and with artis ID ${updateAlbumDto.artistId} was not found`,
       );
-    return updatedUser;
+    return updatedAlbum;
   }
 }

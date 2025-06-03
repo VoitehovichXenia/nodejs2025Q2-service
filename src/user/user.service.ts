@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
 import { User, CreateUserDto, PublicUser, UpdateUserProps } from './user.const';
+import { generateUUID } from 'src/common/utils/generateUUID';
 
 @Injectable()
 export class UserService {
@@ -19,12 +19,12 @@ export class UserService {
     return this._users.find((user) => user.id === id);
   }
 
-  public create({ login, password }: CreateUserDto): User {
+  public create(createUserDto: CreateUserDto): User {
     const createdAt = Date.now();
+    const id = generateUUID(this._users);
     const newUser: User = {
-      id: randomUUID(),
-      login,
-      password,
+      ...createUserDto,
+      id,
       version: 1,
       createdAt,
       updatedAt: createdAt,

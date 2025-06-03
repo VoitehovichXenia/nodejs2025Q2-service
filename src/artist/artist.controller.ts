@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { Artist, ArtistDto } from './artist.const';
 import { ArtistService } from './artist.service';
-import { CheckHeaders } from 'src/common/checkHeaders';
+import { CheckHeaders } from 'src/common/guards/headers.guard';
 
 @Controller('artist')
 export class ArtistController {

@@ -1,9 +1,9 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { randomUUID } from 'node:crypto';
 import { Artist, ArtistDto } from './artist.const';
 import { AlbumService } from 'src/album/album.service';
 import { TrackService } from 'src/track/track.service';
 import { FavoritesService } from 'src/favorite/favorite.service';
+import { generateUUID } from 'src/common/utils/generateUUID';
 
 @Injectable()
 export class ArtistService {
@@ -26,12 +26,9 @@ export class ArtistService {
     return this._artists.find((artist) => artist.id === id);
   }
 
-  public create({ name, grammy }: ArtistDto): Artist {
-    const newArtist = {
-      id: randomUUID(),
-      name,
-      grammy,
-    };
+  public create(createArtistDto: ArtistDto): Artist {
+    const id = generateUUID(this._artists);
+    const newArtist = { ...createArtistDto, id };
     this._artists.push(newArtist);
     return newArtist;
   }
@@ -46,15 +43,10 @@ export class ArtistService {
     return true;
   }
 
-  public update({ id, name, grammy }: Artist): Artist | null {
-    const artist = this.getById(id);
-    if (!artist) return null;
+  public update({ id, ...updateArtistDto }: Artist): Artist | null {
     const artistIndex = this._artists.findIndex((artist) => artist.id === id);
-    const updatedArtist = {
-      id,
-      name,
-      grammy,
-    };
+    if (artistIndex === -1) return null;
+    const updatedArtist = { id, ...updateArtistDto };
     this._artists[artistIndex] = updatedArtist;
     return updatedArtist;
   }

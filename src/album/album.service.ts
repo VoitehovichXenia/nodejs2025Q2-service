@@ -1,9 +1,9 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Album, AlbumDto } from './album.const';
-import { randomUUID } from 'crypto';
 import { ArtistService } from 'src/artist/artist.service';
 import { TrackService } from 'src/track/track.service';
 import { FavoritesService } from 'src/favorite/favorite.service';
+import { generateUUID } from 'src/common/utils/generateUUID';
 
 @Injectable()
 export class AlbumService {
@@ -30,15 +30,12 @@ export class AlbumService {
     return this._albums.find((album) => album.id === id);
   }
 
-  public create({ name, year, artistId }: AlbumDto): Album | null {
+  public create(createAlbumDto: AlbumDto): Album | null {
+    const { artistId } = createAlbumDto;
     const artist = artistId ? this.artistService.getById(artistId) : true;
     if (!artist) return null;
-    const newAlbum = {
-      id: randomUUID(),
-      name,
-      year,
-      artistId: artistId ?? null,
-    };
+    const id = generateUUID(this._albums);
+    const newAlbum = { ...createAlbumDto, id };
     this._albums.push(newAlbum);
     return newAlbum;
   }
@@ -60,15 +57,13 @@ export class AlbumService {
     return true;
   }
 
-  public update({ id, name, year, artistId }: Album): Album | null {
-    const album = this.getById(id);
+  public update(updateAlbumDto: Album): Album | null {
+    const { id, artistId } = updateAlbumDto;
     const artist = artistId ? this.artistService.getById(artistId) : true;
-    if (!album || !artist) return null;
     const albumIndex = this._albums.findIndex((album) => album.id === id);
+    if (albumIndex === -1 || !artist) return null;
     const updatedAlbum = {
-      id,
-      name,
-      year,
+      ...updateAlbumDto,
       artistId: artistId ?? null,
     };
     this._albums[albumIndex] = updatedAlbum;

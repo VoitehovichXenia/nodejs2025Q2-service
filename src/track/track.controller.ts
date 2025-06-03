@@ -14,7 +14,7 @@ import {
 } from '@nestjs/common';
 import { TrackService } from './track.service';
 import { Track, TrackDto } from './track.const';
-import { CheckHeaders } from 'src/common/checkHeaders';
+import { CheckHeaders } from 'src/common/guards/headers.guard';
 
 @Controller('track')
 export class TrackController {

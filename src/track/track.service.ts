@@ -1,9 +1,9 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Track, TrackDto } from './track.const';
-import { randomUUID } from 'node:crypto';
 import { AlbumService } from 'src/album/album.service';
 import { ArtistService } from 'src/artist/artist.service';
 import { FavoritesService } from 'src/favorite/favorite.service';
+import { generateUUID } from 'src/common/utils/generateUUID';
 
 @Injectable()
 export class TrackService {
@@ -33,17 +33,13 @@ export class TrackService {
     return this._tracks.find((track) => track.id === id);
   }
 
-  public create({ name, albumId, artistId, duration }: TrackDto): Track | null {
+  public create(createTrackDto: TrackDto): Track | null {
+    const { albumId, artistId } = createTrackDto;
     const album = albumId ? this.albumService.getById(albumId) : true;
     const artist = artistId ? this.artistService.getById(artistId) : true;
     if (!album || !artist) return null;
-    const newTrack = {
-      id: randomUUID(),
-      name,
-      artistId: artistId ?? null,
-      albumId: albumId ?? null,
-      duration,
-    };
+    const id = generateUUID(this._tracks);
+    const newTrack = { ...createTrackDto, id };
     this._tracks.push(newTrack);
     return newTrack;
   }
@@ -70,25 +66,17 @@ export class TrackService {
     });
   }
 
-  public update({
-    id,
-    albumId,
-    artistId,
-    name,
-    duration,
-  }: Track): Track | null {
-    const track = this.getById(id);
-    if (!track) return null;
+  public update(updateTrackDto: Track): Track | null {
+    const { id, albumId, artistId } = updateTrackDto;
     const album = albumId ? this.albumService.getById(albumId) : true;
     const artist = artistId ? this.artistService.getById(artistId) : true;
     if (!album || !artist) return null;
     const trackIndex = this._tracks.findIndex((track) => track.id === id);
+    if (trackIndex === -1) return null;
     const updatedUser = {
-      id,
+      ...updateTrackDto,
       albumId: albumId ?? null,
       artistId: artistId ?? null,
-      name,
-      duration,
     };
     this._tracks[trackIndex] = updatedUser;
     return updatedUser;
