@@ -61,6 +61,12 @@ git clone https://github.com/VoitehovichXenia/nodejs2025Q2-service.git
 npm install
 ```
 
+### Creating .env file
+
+```
+npm run create:env
+```
+
 ### Running application
 
 ```
