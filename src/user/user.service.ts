@@ -1,57 +1,92 @@
-import { Injectable } from '@nestjs/common';
-import { User, CreateUserDto, PublicUser, UpdateUserProps } from './user.const';
-import { generateUUID } from 'src/common/utils/generateUUID';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  CreateUserDto,
+  PublicUser,
+  SerializedUser,
+  UpdateUserProps,
+} from './user.const';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class UserService {
-  private _users: User[] = [];
+  constructor(private readonly prisma: PrismaService) {}
 
-  public getPublicInfo(user: User): PublicUser {
-    const { id, login, version, createdAt, updatedAt } = user;
-    return { id, login, version, createdAt, updatedAt };
-  }
-
-  public getAll(): User[] {
-    return this._users;
-  }
-
-  public getById(id: string): User | null {
-    return this._users.find((user) => user.id === id);
-  }
-
-  public create(createUserDto: CreateUserDto): User {
-    const createdAt = Date.now();
-    const id = generateUUID(this._users);
-    const newUser: User = {
-      ...createUserDto,
-      id,
-      version: 1,
-      createdAt,
-      updatedAt: createdAt,
-    };
-    this._users.push(newUser);
-    return newUser;
-  }
-
-  public delete(id: string): boolean {
-    const user = this.getById(id);
-    if (!user) return false;
-    this._users = this._users.filter((user) => user.id !== id);
-    return true;
-  }
-
-  public update({ newPassword, id }: UpdateUserProps): User | null {
-    const user = this.getById(id);
-    if (!user) return null;
-    const userIndex = this._users.findIndex((user) => user.id === id);
-    const updatedAt = Date.now();
-    const updatedUser: User = {
+  private _serialize(user: PublicUser): SerializedUser {
+    return {
       ...user,
-      password: newPassword,
-      version: user.version + 1,
-      updatedAt,
+      createdAt: new Date(user.createdAt).getTime(),
+      updatedAt: new Date(user.updatedAt).getTime(),
     };
-    this._users[userIndex] = updatedUser;
-    return updatedUser;
+  }
+
+  public async getAll(): Promise<SerializedUser[]> {
+    const users = await this.prisma.client.user.findMany({
+      omit: { password: true },
+    });
+    return users.map((user) => this._serialize(user));
+  }
+
+  public async getById(id: string): Promise<SerializedUser | null> {
+    const user = await this.prisma.client.user.findUnique({
+      where: { id },
+      omit: { password: true },
+    });
+    if (!user) return null;
+    return this._serialize(user);
+  }
+
+  public async create(createUserDto: CreateUserDto): Promise<SerializedUser> {
+    const createdAt = new Date();
+    const newUser = await this.prisma.client.user.create({
+      data: {
+        ...createUserDto,
+        version: 1,
+        createdAt,
+        updatedAt: createdAt,
+      },
+      omit: { password: true },
+    });
+    return this._serialize(newUser);
+  }
+
+  public async delete(id: string): Promise<boolean> {
+    try {
+      await this.prisma.user.delete({
+        where: { id },
+        omit: { password: true },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  public async update({
+    oldPassword,
+    newPassword,
+    id,
+  }: UpdateUserProps): Promise<SerializedUser> {
+    const user = await this.prisma.client.user.findUnique({
+      where: { id },
+    });
+    if (!user) throw new NotFoundException(`User with ID ${id} was not found`);
+    if (user.password !== oldPassword)
+      throw new ForbiddenException('User password is incorect');
+    const updatedAt = new Date();
+    const updatedVersion = user.version + 1;
+    const updatedUser = await this.prisma.client.user.update({
+      where: { id },
+      data: {
+        updatedAt,
+        version: updatedVersion,
+        password: newPassword,
+      },
+      omit: { password: true },
+    });
+    return this._serialize(updatedUser);
   }
 }
