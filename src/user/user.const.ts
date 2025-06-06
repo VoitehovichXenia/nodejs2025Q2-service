@@ -8,7 +8,6 @@ export class CreateUserDto {
   @MinLength(3)
   login: string;
   @IsString()
-  @MinLength(6)
   @IsNotBlank()
   password: string;
 }
@@ -19,7 +18,7 @@ export class UpdatePasswordDto {
   oldPassword: string;
   @IsString()
   @IsNotEmpty()
-  @MinLength(6)
+  @IsNotBlank()
   newPassword: string;
 }
 

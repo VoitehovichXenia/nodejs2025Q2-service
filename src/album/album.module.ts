@@ -4,6 +4,7 @@ import { AlbumService } from './album.service';
 import { ArtistModule } from 'src/artist/artist.module';
 import { TrackModule } from 'src/track/track.module';
 import { FavoritesModule } from 'src/favorite/favorite.module';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Module({
   imports: [
@@ -12,7 +13,7 @@ import { FavoritesModule } from 'src/favorite/favorite.module';
     forwardRef(() => FavoritesModule),
   ],
   controllers: [AlbumController],
-  providers: [AlbumService],
+  providers: [AlbumService, PrismaService],
   exports: [AlbumService],
 })
 export class AlbumModule {}

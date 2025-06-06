@@ -12,8 +12,9 @@ import {
   NotFoundException,
   UseGuards,
 } from '@nestjs/common';
+import { Album } from '@prisma/client';
+import { AlbumDto } from './album.const';
 import { AlbumService } from './album.service';
-import { Album, AlbumDto } from './album.const';
 import { CheckHeaders } from 'src/common/guards/headers.guard';
 
 @Controller('album')
@@ -21,12 +22,12 @@ export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
   @Get()
-  getAllAlbums(): Album[] {
-    return this.albumService.getAll();
+  async getAllAlbums(): Promise<Album[]> {
+    return await this.albumService.getAll();
   }
 
   @Get(':id')
-  getAlbum(
+  async getAlbum(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -36,8 +37,8 @@ export class AlbumController {
       }),
     )
     id: string,
-  ): Album {
-    const album = this.albumService.getById(id);
+  ): Promise<Album> {
+    const album = await this.albumService.getById(id);
     if (!album)
       throw new NotFoundException(`Album with ID ${id} was not found`);
     return album;
@@ -45,8 +46,8 @@ export class AlbumController {
 
   @UseGuards(CheckHeaders)
   @Post()
-  createAlbum(@Body() createAlbumDto: AlbumDto): Album {
-    const newAlbum = this.albumService.create(createAlbumDto);
+  async createAlbum(@Body() createAlbumDto: AlbumDto): Promise<Album> {
+    const newAlbum = await this.albumService.create(createAlbumDto);
     if (!newAlbum)
       throw new NotFoundException(
         `Artist with artistId ${createAlbumDto.artistId} doesn't exist`,
@@ -56,7 +57,7 @@ export class AlbumController {
 
   @Delete(':id')
   @HttpCode(204)
-  deleteAlbum(
+  async deleteAlbum(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -66,15 +67,15 @@ export class AlbumController {
       }),
     )
     id: string,
-  ): void {
-    const isAlbumDeleted = this.albumService.delete(id);
+  ): Promise<void> {
+    const isAlbumDeleted = await this.albumService.delete(id);
     if (!isAlbumDeleted)
       throw new NotFoundException(`Album with ID ${id} was not found`);
   }
 
   @UseGuards(CheckHeaders)
   @Put(':id')
-  updateAlbum(
+  async updateAlbum(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -85,8 +86,11 @@ export class AlbumController {
     )
     id: string,
     @Body() updateAlbumDto: AlbumDto,
-  ): Album {
-    const updatedAlbum = this.albumService.update({ ...updateAlbumDto, id });
+  ): Promise<Album> {
+    const updatedAlbum = await this.albumService.update({
+      ...updateAlbumDto,
+      id,
+    });
     if (!updatedAlbum)
       throw new NotFoundException(
         `Album with ID ${id} and with artis ID ${updateAlbumDto.artistId} was not found`,

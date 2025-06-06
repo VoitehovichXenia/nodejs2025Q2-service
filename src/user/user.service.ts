@@ -23,15 +23,17 @@ export class UserService {
     };
   }
 
+  private _users = this.prisma.client.user;
+
   public async getAll(): Promise<SerializedUser[]> {
-    const users = await this.prisma.client.user.findMany({
+    const users = await this._users.findMany({
       omit: { password: true },
     });
     return users.map((user) => this._serialize(user));
   }
 
   public async getById(id: string): Promise<SerializedUser | null> {
-    const user = await this.prisma.client.user.findUnique({
+    const user = await this._users.findUnique({
       where: { id },
       omit: { password: true },
     });
@@ -41,7 +43,7 @@ export class UserService {
 
   public async create(createUserDto: CreateUserDto): Promise<SerializedUser> {
     const createdAt = new Date();
-    const newUser = await this.prisma.client.user.create({
+    const newUser = await this._users.create({
       data: {
         ...createUserDto,
         version: 1,
@@ -54,15 +56,15 @@ export class UserService {
   }
 
   public async delete(id: string): Promise<boolean> {
-    try {
-      await this.prisma.user.delete({
-        where: { id },
-        omit: { password: true },
-      });
-      return true;
-    } catch {
-      return false;
-    }
+    const user = await this._users.findUnique({
+      where: { id },
+    });
+    if (!user) return false;
+    await this.prisma.user.delete({
+      where: { id },
+      omit: { password: true },
+    });
+    return true;
   }
 
   public async update({
@@ -70,7 +72,7 @@ export class UserService {
     newPassword,
     id,
   }: UpdateUserProps): Promise<SerializedUser> {
-    const user = await this.prisma.client.user.findUnique({
+    const user = await this._users.findUnique({
       where: { id },
     });
     if (!user) throw new NotFoundException(`User with ID ${id} was not found`);
@@ -78,7 +80,7 @@ export class UserService {
       throw new ForbiddenException('User password is incorect');
     const updatedAt = new Date();
     const updatedVersion = user.version + 1;
-    const updatedUser = await this.prisma.client.user.update({
+    const updatedUser = await this._users.update({
       where: { id },
       data: {
         updatedAt,
