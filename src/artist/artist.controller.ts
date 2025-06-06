@@ -12,7 +12,8 @@ import {
   NotFoundException,
   UseGuards,
 } from '@nestjs/common';
-import { Artist, ArtistDto } from './artist.const';
+import { Artist } from '@prisma/client';
+import { ArtistDto } from './artist.const';
 import { ArtistService } from './artist.service';
 import { CheckHeaders } from 'src/common/guards/headers.guard';
 
@@ -21,12 +22,12 @@ export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
   @Get()
-  getAllArtists(): Artist[] {
-    return this.artistService.getAll();
+  async getAllArtists(): Promise<Artist[]> {
+    return await this.artistService.getAll();
   }
 
   @Get(':id')
-  getArtist(
+  async getArtist(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -36,8 +37,8 @@ export class ArtistController {
       }),
     )
     id: string,
-  ): Artist {
-    const artist = this.artistService.getById(id);
+  ): Promise<Artist> {
+    const artist = await this.artistService.getById(id);
     if (!artist)
       throw new NotFoundException(`Artist with ID ${id} was not found`);
     return artist;
@@ -45,13 +46,13 @@ export class ArtistController {
 
   @UseGuards(CheckHeaders)
   @Post()
-  createArtist(@Body() createArtistDto: ArtistDto): Artist {
-    return this.artistService.create(createArtistDto);
+  async createArtist(@Body() createArtistDto: ArtistDto): Promise<Artist> {
+    return await this.artistService.create(createArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  deleteArtist(
+  async deleteArtist(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -61,15 +62,15 @@ export class ArtistController {
       }),
     )
     id: string,
-  ): void {
-    const isArtistDeleted = this.artistService.delete(id);
+  ): Promise<void> {
+    const isArtistDeleted = await this.artistService.delete(id);
     if (!isArtistDeleted)
       throw new NotFoundException(`Artist with ID ${id} was not found`);
   }
 
   @UseGuards(CheckHeaders)
   @Put(':id')
-  updateArtist(
+  async updateArtist(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -80,8 +81,11 @@ export class ArtistController {
     )
     id: string,
     @Body() updateArtistDto: ArtistDto,
-  ) {
-    const updatedArtist = this.artistService.update({ ...updateArtistDto, id });
+  ): Promise<Artist> {
+    const updatedArtist = await this.artistService.update({
+      ...updateArtistDto,
+      id,
+    });
     if (!updatedArtist)
       throw new NotFoundException(`Artist with ID ${id} was not found`);
     return updatedArtist;
