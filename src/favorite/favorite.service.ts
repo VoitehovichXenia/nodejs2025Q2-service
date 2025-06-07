@@ -33,21 +33,9 @@ export class FavoritesService {
   };
 
   public async getAll(): Promise<PublicFavorites> {
-    const tracks = await Promise.all(
-      this._favs.tracks.map((trackId) => {
-        return this.trackService.getById(trackId);
-      }),
-    );
-    const albums = await Promise.all(
-      this._favs.albums.map((albumId) => {
-        return this.albumService.getById(albumId);
-      }),
-    );
-    const artists = await Promise.all(
-      this._favs.artists.map((artistId) => {
-        return this.artistService.getById(artistId);
-      }),
-    );
+    const tracks = await this.trackService.getAll(this._favs.tracks);
+    const albums = await this.albumService.getAll(this._favs.albums);
+    const artists = await this.artistService.getAll(this._favs.artists);
     return {
       tracks,
       albums,
@@ -55,19 +43,25 @@ export class FavoritesService {
     };
   }
 
-  private _addEntity(id: string, category: FavoritesCategories): boolean {
+  private async _addEntity(
+    id: string,
+    category: FavoritesCategories,
+  ): Promise<boolean> {
     const isEntityInFavs = this._favs[category].includes(id);
     if (isEntityInFavs) return false;
     const serviceName = this._categoryServices[category];
-    const entity = this[serviceName].getById(id);
+    const entity = await this[serviceName].getById(id);
     if (!entity) return false;
     this._favs[category].push(id);
     return true;
   }
 
-  private _deleteEntity(id: string, category: FavoritesCategories): boolean {
+  private async _deleteEntity(
+    id: string,
+    category: FavoritesCategories,
+  ): Promise<boolean> {
     const serviceName = this._categoryServices[category];
-    const entity = this[serviceName].getById(id);
+    const entity = await this[serviceName].getById(id);
     if (!entity) return false;
     this._favs[category] = this._favs[category].filter(
       (entityId) => entityId !== id,
@@ -75,27 +69,27 @@ export class FavoritesService {
     return true;
   }
 
-  public addTrack(id: string): boolean {
-    return this._addEntity(id, 'tracks');
+  public async addTrack(id: string): Promise<boolean> {
+    return await this._addEntity(id, 'tracks');
   }
 
-  public deleteTrack(id: string): boolean {
-    return this._deleteEntity(id, 'tracks');
+  public async deleteTrack(id: string): Promise<boolean> {
+    return await this._deleteEntity(id, 'tracks');
   }
 
-  public addAlbum(id: string): boolean {
-    return this._addEntity(id, 'albums');
+  public async addAlbum(id: string): Promise<boolean> {
+    return await this._addEntity(id, 'albums');
   }
 
-  public deleteAlbum(id: string): boolean {
-    return this._deleteEntity(id, 'albums');
+  public async deleteAlbum(id: string): Promise<boolean> {
+    return await this._deleteEntity(id, 'albums');
   }
 
-  public addArtist(id: string): boolean {
-    return this._addEntity(id, 'artists');
+  public async addArtist(id: string): Promise<boolean> {
+    return await this._addEntity(id, 'artists');
   }
 
-  public deleteArtist(id: string): boolean {
-    return this._deleteEntity(id, 'artists');
+  public async deleteArtist(id: string): Promise<boolean> {
+    return await this._deleteEntity(id, 'artists');
   }
 }

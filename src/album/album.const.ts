@@ -9,13 +9,6 @@ import {
 } from 'class-validator';
 import { IsNotBlank } from 'src/common/validators/IsNotBlank.validator';
 
-export interface Album {
-  id: string;
-  name: string;
-  year: number;
-  artistId: string | null;
-}
-
 export class AlbumDto {
   @IsString()
   @MinLength(1)

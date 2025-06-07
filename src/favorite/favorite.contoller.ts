@@ -23,7 +23,7 @@ export class FavoritesController {
   }
 
   @Post('/track/:id')
-  addTrackToFavs(
+  async addTrackToFavs(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -33,8 +33,8 @@ export class FavoritesController {
       }),
     )
     id: string,
-  ): void {
-    const isTrackAddedToFavs = this.favoritesService.addTrack(id);
+  ): Promise<void> {
+    const isTrackAddedToFavs = await this.favoritesService.addTrack(id);
     if (!isTrackAddedToFavs)
       throw new UnprocessableEntityException(
         `Track with ID ${id} was not found`,
@@ -43,7 +43,7 @@ export class FavoritesController {
 
   @Delete('/track/:id')
   @HttpCode(204)
-  deleteTrackFromFavs(
+  async deleteTrackFromFavs(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -53,8 +53,8 @@ export class FavoritesController {
       }),
     )
     id: string,
-  ): void {
-    const isTrackDeletedFromFavs = this.favoritesService.deleteTrack(id);
+  ): Promise<void> {
+    const isTrackDeletedFromFavs = await this.favoritesService.deleteTrack(id);
     if (!isTrackDeletedFromFavs)
       throw new NotFoundException(
         `Track with ID ${id} was not added to favorites`,
@@ -62,7 +62,7 @@ export class FavoritesController {
   }
 
   @Post('/album/:id')
-  addAlbumToFavs(
+  async addAlbumToFavs(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -72,8 +72,8 @@ export class FavoritesController {
       }),
     )
     id: string,
-  ): void {
-    const isAlbumAddedToFavs = this.favoritesService.addAlbum(id);
+  ): Promise<void> {
+    const isAlbumAddedToFavs = await this.favoritesService.addAlbum(id);
     if (!isAlbumAddedToFavs)
       throw new UnprocessableEntityException(
         `Album with ID ${id} was not found`,
@@ -82,7 +82,7 @@ export class FavoritesController {
 
   @Delete('/album/:id')
   @HttpCode(204)
-  deleteAlbumFromFavs(
+  async deleteAlbumFromFavs(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -92,8 +92,8 @@ export class FavoritesController {
       }),
     )
     id: string,
-  ): void {
-    const isAlbumDeletedFromFavs = this.favoritesService.deleteAlbum(id);
+  ): Promise<void> {
+    const isAlbumDeletedFromFavs = await this.favoritesService.deleteAlbum(id);
     if (!isAlbumDeletedFromFavs)
       throw new NotFoundException(
         `Album with ID ${id} was not added to favorites`,
@@ -101,7 +101,7 @@ export class FavoritesController {
   }
 
   @Post('/artist/:id')
-  addArtistToFavs(
+  async addArtistToFavs(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -111,8 +111,8 @@ export class FavoritesController {
       }),
     )
     id: string,
-  ): void {
-    const isArtistAddedToFavs = this.favoritesService.addArtist(id);
+  ): Promise<void> {
+    const isArtistAddedToFavs = await this.favoritesService.addArtist(id);
     if (!isArtistAddedToFavs)
       throw new UnprocessableEntityException(
         `Artist with ID ${id} was not found`,
@@ -121,7 +121,7 @@ export class FavoritesController {
 
   @Delete('/artist/:id')
   @HttpCode(204)
-  deleteArtistFromFavs(
+  async deleteArtistFromFavs(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -131,8 +131,9 @@ export class FavoritesController {
       }),
     )
     id: string,
-  ): void {
-    const isArtistDeletedFromFavs = this.favoritesService.deleteArtist(id);
+  ): Promise<void> {
+    const isArtistDeletedFromFavs =
+      await this.favoritesService.deleteArtist(id);
     if (!isArtistDeletedFromFavs)
       throw new NotFoundException(
         `Artist with ID ${id} was not added to favorites`,

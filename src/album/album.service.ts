@@ -2,7 +2,6 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Album } from '@prisma/client';
 import { AlbumDto } from './album.const';
 import { ArtistService } from 'src/artist/artist.service';
-// import { TrackService } from 'src/track/track.service';
 import { FavoritesService } from 'src/favorite/favorite.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -12,16 +11,18 @@ export class AlbumService {
     private readonly prisma: PrismaService,
     @Inject(forwardRef(() => ArtistService))
     private readonly artistService: ArtistService,
-    // @Inject(forwardRef(() => TrackService))
-    // private readonly trackService: TrackService,
     @Inject(forwardRef(() => FavoritesService))
     private readonly favouritesService: FavoritesService,
   ) {}
 
   private _albums = this.prisma.client.album;
 
-  public async getAll(): Promise<Album[]> {
-    return await this._albums.findMany();
+  public async getAll(ids?: string[]): Promise<Album[]> {
+    return await this._albums.findMany({
+      where: {
+        id: { in: ids },
+      },
+    });
   }
 
   public async getById(id: string): Promise<Album> {

@@ -9,16 +9,18 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ArtistService {
   constructor(
     private readonly prisma: PrismaService,
-    // @Inject(forwardRef(() => TrackService))
-    // private readonly trackService: TrackService,
     @Inject(forwardRef(() => FavoritesService))
     private readonly favouritesService: FavoritesService,
   ) {}
 
   private _artists = this.prisma.client.artist;
 
-  public async getAll(): Promise<Artist[]> {
-    return await this._artists.findMany();
+  public async getAll(ids?: string[]): Promise<Artist[]> {
+    return await this._artists.findMany({
+      where: {
+        id: { in: ids },
+      },
+    });
   }
 
   public async getById(id: string): Promise<Artist | null> {

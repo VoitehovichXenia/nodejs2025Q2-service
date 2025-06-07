@@ -13,7 +13,8 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { TrackService } from './track.service';
-import { Track, TrackDto } from './track.const';
+import { Track } from '@prisma/client';
+import { TrackDto } from './track.const';
 import { CheckHeaders } from 'src/common/guards/headers.guard';
 
 @Controller('track')

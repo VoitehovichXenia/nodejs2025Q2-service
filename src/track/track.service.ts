@@ -20,8 +20,14 @@ export class TrackService {
 
   private _tracks = this.prisma.client.track;
 
-  public async getAll(): Promise<Track[]> {
-    return await this._tracks.findMany();
+  public async getAll(ids?: string[]): Promise<Track[]> {
+    return await this._tracks.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    });
   }
 
   public async getById(id: string): Promise<Track | null> {
@@ -46,6 +52,7 @@ export class TrackService {
     await this._tracks.delete({
       where: { id },
     });
+    this.favoritesService.deleteTrack(id);
     return true;
   }
 
