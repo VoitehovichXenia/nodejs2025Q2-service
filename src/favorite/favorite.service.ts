@@ -33,9 +33,11 @@ export class FavoritesService {
   };
 
   public async getAll(): Promise<PublicFavorites> {
-    const tracks = this._favs.tracks.map((trackId) => {
-      return this.trackService.getById(trackId);
-    });
+    const tracks = await Promise.all(
+      this._favs.tracks.map((trackId) => {
+        return this.trackService.getById(trackId);
+      }),
+    );
     const albums = await Promise.all(
       this._favs.albums.map((albumId) => {
         return this.albumService.getById(albumId);

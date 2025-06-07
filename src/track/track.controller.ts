@@ -21,12 +21,12 @@ export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Get()
-  getAllTracks(): Track[] {
+  async getAllTracks(): Promise<Track[]> {
     return this.trackService.getAll();
   }
 
   @Get(':id')
-  getTrack(
+  async getTrack(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -36,8 +36,8 @@ export class TrackController {
       }),
     )
     id: string,
-  ): Track {
-    const track = this.trackService.getById(id);
+  ): Promise<Track> {
+    const track = await this.trackService.getById(id);
     if (!track)
       throw new NotFoundException(`Track with ID ${id} was not found`);
     return track;
@@ -45,8 +45,8 @@ export class TrackController {
 
   @UseGuards(CheckHeaders)
   @Post()
-  createTrack(@Body() createTrackDto: TrackDto): Track {
-    const newTrack = this.trackService.create(createTrackDto);
+  async createTrack(@Body() createTrackDto: TrackDto): Promise<Track> {
+    const newTrack = await this.trackService.create(createTrackDto);
     if (!newTrack)
       throw new NotFoundException(
         `Check artistId and albumId, there no artists or albums with such ids`,
@@ -56,7 +56,7 @@ export class TrackController {
 
   @Delete(':id')
   @HttpCode(204)
-  deleteTrack(
+  async deleteTrack(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -66,15 +66,15 @@ export class TrackController {
       }),
     )
     id: string,
-  ): void {
-    const isTrackDeleted = this.trackService.delete(id);
+  ): Promise<void> {
+    const isTrackDeleted = await this.trackService.delete(id);
     if (!isTrackDeleted)
       throw new NotFoundException(`Track with ID ${id} was not found`);
   }
 
   @UseGuards(CheckHeaders)
   @Put(':id')
-  updateTrack(
+  async updateTrack(
     @Param(
       'id',
       new ParseUUIDPipe({
@@ -85,8 +85,11 @@ export class TrackController {
     )
     id: string,
     @Body() updateTrackDto: TrackDto,
-  ): Track {
-    const updatedTrack = this.trackService.update({ ...updateTrackDto, id });
+  ): Promise<Track> {
+    const updatedTrack = await this.trackService.update({
+      ...updateTrackDto,
+      id,
+    });
     if (!updatedTrack)
       throw new NotFoundException(
         `Check artistId and albumId, there no artists or albums with such ids`,

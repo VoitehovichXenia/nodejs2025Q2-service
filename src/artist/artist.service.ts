@@ -1,7 +1,7 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Artist } from '@prisma/client';
 import { ArtistDto } from './artist.const';
-import { TrackService } from 'src/track/track.service';
+// import { TrackService } from 'src/track/track.service';
 import { FavoritesService } from 'src/favorite/favorite.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
@@ -9,8 +9,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class ArtistService {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(forwardRef(() => TrackService))
-    private readonly trackService: TrackService,
+    // @Inject(forwardRef(() => TrackService))
+    // private readonly trackService: TrackService,
     @Inject(forwardRef(() => FavoritesService))
     private readonly favouritesService: FavoritesService,
   ) {}
@@ -34,14 +34,11 @@ export class ArtistService {
   }
 
   public async delete(id: string): Promise<boolean> {
-    const artist = await this._artists.findUnique({
-      where: { id },
-    });
+    const artist = await this.getById(id);
     if (!artist) return false;
     await this._artists.delete({
       where: { id },
     });
-    this.trackService.deleteArtistId(id);
     this.favouritesService.deleteArtist(id);
     return true;
   }
@@ -50,9 +47,7 @@ export class ArtistService {
     id,
     ...updateArtistDto
   }: Artist): Promise<Artist | null> {
-    const artist = await this._artists.findUnique({
-      where: { id },
-    });
+    const artist = await this.getById(id);
     if (!artist) return null;
     const updatedArtist = await this._artists.update({
       where: { id },

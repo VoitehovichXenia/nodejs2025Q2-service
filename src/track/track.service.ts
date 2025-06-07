@@ -1,13 +1,15 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
-import { Track, TrackDto } from './track.const';
+import { Track } from '@prisma/client';
+import { TrackDto } from './track.const';
 import { AlbumService } from 'src/album/album.service';
 import { ArtistService } from 'src/artist/artist.service';
 import { FavoritesService } from 'src/favorite/favorite.service';
-import { generateUUID } from 'src/common/utils/generateUUID';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class TrackService {
   constructor(
+    private readonly prisma: PrismaService,
     @Inject(forwardRef(() => AlbumService))
     private readonly albumService: AlbumService,
     @Inject(forwardRef(() => ArtistService))
@@ -15,70 +17,48 @@ export class TrackService {
     @Inject(forwardRef(() => FavoritesService))
     private readonly favoritesService: FavoritesService,
   ) {}
-  private _tracks: Track[] = [];
 
-  private _getAlbumTracks(albumId: string): Track[] {
-    return this._tracks.filter((track) => track.albumId === albumId);
+  private _tracks = this.prisma.client.track;
+
+  public async getAll(): Promise<Track[]> {
+    return await this._tracks.findMany();
   }
 
-  private _getArtistTracks(artistId: string): Track[] {
-    return this._tracks.filter((track) => track.artistId === artistId);
+  public async getById(id: string): Promise<Track | null> {
+    return await this._tracks.findUnique({
+      where: { id },
+    });
   }
 
-  public getAll(): Track[] {
-    return this._tracks;
-  }
-
-  public getById(id: string): Track | null {
-    return this._tracks.find((track) => track.id === id);
-  }
-
-  public create(createTrackDto: TrackDto): Track | null {
+  public async create(createTrackDto: TrackDto): Promise<Track | null> {
     const { albumId, artistId } = createTrackDto;
-    const album = albumId ? this.albumService.getById(albumId) : true;
-    const artist = artistId ? this.artistService.getById(artistId) : true;
+    const album = albumId ? await this.albumService.getById(albumId) : true;
+    const artist = artistId ? await this.artistService.getById(artistId) : true;
     if (!album || !artist) return null;
-    const id = generateUUID(this._tracks);
-    const newTrack = { ...createTrackDto, id };
-    this._tracks.push(newTrack);
-    return newTrack;
+    return await this._tracks.create({
+      data: createTrackDto,
+    });
   }
 
-  public delete(id: string): boolean {
-    const track = this.getById(id);
+  public async delete(id: string): Promise<boolean> {
+    const track = await this.getById(id);
     if (!track) return false;
-    this.favoritesService.deleteTrack(id);
-    this._tracks = this._tracks.filter((track) => track.id !== id);
+    await this._tracks.delete({
+      where: { id },
+    });
     return true;
   }
 
-  public deleteAlbumId(albumId: string) {
-    const albumTracks = this._getAlbumTracks(albumId);
-    albumTracks.forEach((track) => {
-      track.albumId = null;
-    });
-  }
-
-  public deleteArtistId(artistId: string) {
-    const artistTracks = this._getArtistTracks(artistId);
-    artistTracks.forEach((track) => {
-      track.artistId = null;
-    });
-  }
-
-  public update(updateTrackDto: Track): Track | null {
+  public async update(updateTrackDto: Track): Promise<Track | null> {
     const { id, albumId, artistId } = updateTrackDto;
+    const track = await this.getById(id);
+    if (!track) return null;
     const album = albumId ? this.albumService.getById(albumId) : true;
     const artist = artistId ? this.artistService.getById(artistId) : true;
     if (!album || !artist) return null;
-    const trackIndex = this._tracks.findIndex((track) => track.id === id);
-    if (trackIndex === -1) return null;
-    const updatedUser = {
-      ...updateTrackDto,
-      albumId: albumId ?? null,
-      artistId: artistId ?? null,
-    };
-    this._tracks[trackIndex] = updatedUser;
-    return updatedUser;
+    return await this._tracks.update({
+      where: { id },
+      data: updateTrackDto,
+    });
   }
 }
