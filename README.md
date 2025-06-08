@@ -5,7 +5,10 @@
     1. [Prerequesties](#prerequisites)
     2. [Downloading](#downloading)
     3. [Installing](#installing-npm-modules)
-    4. [Running](#running-application)
+    4. [Scanning vulnerabilities](#scanning-vulnerabilities)
+    5. [Creating .env file](#creating-env-file)
+    5. [Add required env variables](#add-required-env-variables)
+    4. [Running](#running-application-with-docker)
     5. [Testing](#testing)
     6. [Linting and Formating](#auto-fix-and-format)
 2. [API Documentation](#api-documentation)
@@ -75,14 +78,17 @@ npm run scan:vulnerabilities
 npm run create:env
 ```
 
-### Add required env variables:
+### Add required env variables
 
 ```
-# Insert your Docker username instead <your_db_user>
+# Postgres
+POSTGRES_DB=home_library
+# Insert your username
 POSTGRES_USER=<your_db_user>
-# Insert your Docker password instead <your_db_password>
+# Insert your password
 POSTGRES_PASSWORD=<your_db_password>
 
+# Docker database url
 # Replace <user> and <password> with POSTGRES_USER and POSTGRES_PASSWORD values
 DATABASE_URL=postgres://<user>:<pass>@database:5432/home_library
 ```
