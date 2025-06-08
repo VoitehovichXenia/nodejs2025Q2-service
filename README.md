@@ -48,6 +48,8 @@
 
 - Git - [Download & Install Git](https://git-scm.com/downloads).
 - Node.js - [Download & Install Node.js](https://nodejs.org/en/download/) and the npm package manager.
+- Docker - [Download & Install Docker](https://docs.docker.com/engine/install/)
+- Create DockerHub account [DockerHub](https://hub.docker.com/)
 
 ### Downloading
 
@@ -61,17 +63,37 @@ git clone https://github.com/VoitehovichXenia/nodejs2025Q2-service.git
 npm install
 ```
 
+### Scanning vulnerabilities
+
+```
+npm run scan:vulnerabilities
+```
+
 ### Creating .env file
 
 ```
 npm run create:env
 ```
 
-### Running application
+### Add required env variables:
 
 ```
-npm start
+# Insert your Docker username instead <your_db_user>
+POSTGRES_USER=<your_db_user>
+# Insert your Docker password instead <your_db_password>
+POSTGRES_PASSWORD=<your_db_password>
+
+# Replace <user> and <password> with POSTGRES_USER and POSTGRES_PASSWORD values
+DATABASE_URL=postgres://<user>:<pass>@database:5432/home_library
 ```
+
+### Running application with Docker
+
+```
+docker compose up --build
+```
+
+NOTE: please wait while containers will be fully built
 
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
