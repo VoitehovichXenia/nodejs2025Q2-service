@@ -29,9 +29,11 @@ COPY .npmrc .npmrc
 RUN npm ci --omit=dev
 
 # Copy application code from builder
+COPY --from=builder /app/doc ./doc
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
 
 # Start app in a dev mode
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
+CMD ["sh", "-c", "npx prisma generate && npx prisma migrate deploy && node dist/main.js"]

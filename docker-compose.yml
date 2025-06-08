@@ -31,9 +31,6 @@ services:
       - ${PORT}:${PORT}
     networks:
       - backend
-    volumes:
-      - .:/app
-      - /app/node_modules
 
 networks:
   backend:
