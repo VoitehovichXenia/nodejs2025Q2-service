@@ -69,7 +69,7 @@ npm install
 ### Scanning vulnerabilities
 
 ```
-npm run scan:vulnerabilities
+npm run scan
 ```
 
 ### Creating .env file
@@ -78,19 +78,15 @@ npm run scan:vulnerabilities
 npm run create:env
 ```
 
+or copy it manualy from `.env.example`
+
 ### Add required env variables
 
 ```
-# Postgres
-POSTGRES_DB=home_library
 # Insert your username
 POSTGRES_USER=<your_db_user>
 # Insert your password
 POSTGRES_PASSWORD=<your_db_password>
-
-# Docker database url
-# Replace <user> and <password> with POSTGRES_USER and POSTGRES_PASSWORD values
-DATABASE_URL=postgres://<user>:<pass>@database:5432/home_library
 ```
 
 ### Running application with Docker
@@ -98,6 +94,7 @@ DATABASE_URL=postgres://<user>:<pass>@database:5432/home_library
 ```
 docker compose up --build
 ```
+NOTE: if you're using docker desktop, please check if docker engine is running before running any docker command
 
 NOTE: please wait while containers will be fully built
 
