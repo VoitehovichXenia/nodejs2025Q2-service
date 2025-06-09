@@ -1,7 +1,6 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { Artist } from '@prisma/client';
 import { ArtistDto } from './artist.const';
-// import { TrackService } from 'src/track/track.service';
 import { FavoritesService } from 'src/favorite/favorite.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
