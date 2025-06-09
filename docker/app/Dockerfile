@@ -18,7 +18,7 @@ RUN npx prisma generate && npm run build
 
 # STAGE 2: PRODUCTION
 # Specify node image
-FROM node:22-alpine3.22
+FROM node:22-slim
 
 # Set directory for application
 WORKDIR /app

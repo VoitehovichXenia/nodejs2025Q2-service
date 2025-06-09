@@ -66,12 +66,6 @@ git clone https://github.com/VoitehovichXenia/nodejs2025Q2-service.git
 npm install
 ```
 
-### Scanning vulnerabilities
-
-```
-npm run scan
-```
-
 ### Creating .env file
 
 ```
@@ -101,6 +95,12 @@ NOTE: please wait while containers will be fully built
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
+
+### Scanning vulnerabilities
+
+```
+npm run scan
+```
 
 ### Testing
 

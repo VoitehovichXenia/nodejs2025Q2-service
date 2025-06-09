@@ -29,7 +29,7 @@
     "scan": "docker scout quickview abjektmar/home_library_app:latest & docker scout quickview abjektmar/home_library_database:latest"
   },
   "dependencies": {
-    "@nestjs/common": "^10.4.16",
+    "@nestjs/common": "^11.0.16",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^10.4.15",
     "@nestjs/jwt": "^11.0.0",
