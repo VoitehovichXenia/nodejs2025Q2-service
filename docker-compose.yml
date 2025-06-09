@@ -31,8 +31,6 @@ services:
       - ${PORT}:${PORT}
     networks:
       - home_library_network
-    volumes:
-      - ./src:/app/src 
 
 networks:
   home_library_network:
