@@ -6,8 +6,7 @@ FROM node:22-alpine3.22 AS builder
 WORKDIR /app
 
 # Copy packages inside application dir
-COPY package*.json ./
-COPY .npmrc .npmrc
+COPY package*.json .npmrc ./
 RUN npm ci
 
 # Copy application code
@@ -18,7 +17,7 @@ RUN npx prisma generate && npm run build
 
 # STAGE 2: PRODUCTION
 # Specify node image
-FROM node:22-slim
+FROM node:22-slim AS main
 
 # Set directory for application
 WORKDIR /app
