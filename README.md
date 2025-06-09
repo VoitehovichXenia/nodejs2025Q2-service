@@ -86,7 +86,7 @@ POSTGRES_PASSWORD=<your_db_password>
 ### Running application with Docker
 
 ```
-docker compose up --build
+docker compose up
 ```
 NOTE: if you're using docker desktop, please check if docker engine is running before running any docker command
 
