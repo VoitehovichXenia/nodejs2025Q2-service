@@ -9,19 +9,23 @@ import {
   ParseUUIDPipe,
   Post,
   UnprocessableEntityException,
+  UseGuards,
 } from '@nestjs/common';
 import { FavoritesService } from './favorite.service';
 import { PublicFavorites } from './favorite.const';
+import { JWTAuthorizationGuard } from 'src/common/guards/authorization.guard';
 
 @Controller('favs')
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
+  @UseGuards(JWTAuthorizationGuard)
   @Get()
   async getAllFavorites(): Promise<PublicFavorites> {
     return await this.favoritesService.getAll();
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Post('/track/:id')
   async addTrackToFavs(
     @Param(
@@ -41,6 +45,7 @@ export class FavoritesController {
       );
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Delete('/track/:id')
   @HttpCode(204)
   async deleteTrackFromFavs(
@@ -61,6 +66,7 @@ export class FavoritesController {
       );
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Post('/album/:id')
   async addAlbumToFavs(
     @Param(
@@ -80,6 +86,7 @@ export class FavoritesController {
       );
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Delete('/album/:id')
   @HttpCode(204)
   async deleteAlbumFromFavs(
@@ -100,6 +107,7 @@ export class FavoritesController {
       );
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Post('/artist/:id')
   async addArtistToFavs(
     @Param(
@@ -119,6 +127,7 @@ export class FavoritesController {
       );
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Delete('/artist/:id')
   @HttpCode(204)
   async deleteArtistFromFavs(

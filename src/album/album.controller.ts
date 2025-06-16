@@ -16,16 +16,19 @@ import { Album } from '@prisma/client';
 import { AlbumDto } from './album.const';
 import { AlbumService } from './album.service';
 import { ContentTypeGuard } from 'src/common/guards/contentType.guard';
+import { JWTAuthorizationGuard } from 'src/common/guards/authorization.guard';
 
 @Controller('album')
 export class AlbumController {
   constructor(private readonly albumService: AlbumService) {}
 
+  @UseGuards(JWTAuthorizationGuard)
   @Get()
   async getAllAlbums(): Promise<Album[]> {
     return await this.albumService.getAll();
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Get(':id')
   async getAlbum(
     @Param(
@@ -44,7 +47,7 @@ export class AlbumController {
     return album;
   }
 
-  @UseGuards(ContentTypeGuard)
+  @UseGuards(JWTAuthorizationGuard, ContentTypeGuard)
   @Post()
   async createAlbum(@Body() createAlbumDto: AlbumDto): Promise<Album> {
     const newAlbum = await this.albumService.create(createAlbumDto);
@@ -55,6 +58,7 @@ export class AlbumController {
     return newAlbum;
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteAlbum(
@@ -73,7 +77,7 @@ export class AlbumController {
       throw new NotFoundException(`Album with ID ${id} was not found`);
   }
 
-  @UseGuards(ContentTypeGuard)
+  @UseGuards(JWTAuthorizationGuard, ContentTypeGuard)
   @Put(':id')
   async updateAlbum(
     @Param(

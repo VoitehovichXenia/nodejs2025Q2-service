@@ -16,16 +16,19 @@ import { TrackService } from './track.service';
 import { Track } from '@prisma/client';
 import { TrackDto } from './track.const';
 import { ContentTypeGuard } from 'src/common/guards/contentType.guard';
+import { JWTAuthorizationGuard } from 'src/common/guards/authorization.guard';
 
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
+  @UseGuards(JWTAuthorizationGuard)
   @Get()
   async getAllTracks(): Promise<Track[]> {
     return this.trackService.getAll();
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Get(':id')
   async getTrack(
     @Param(
@@ -44,7 +47,7 @@ export class TrackController {
     return track;
   }
 
-  @UseGuards(ContentTypeGuard)
+  @UseGuards(JWTAuthorizationGuard, ContentTypeGuard)
   @Post()
   async createTrack(@Body() createTrackDto: TrackDto): Promise<Track> {
     const newTrack = await this.trackService.create(createTrackDto);
@@ -55,6 +58,7 @@ export class TrackController {
     return newTrack;
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteTrack(
@@ -73,7 +77,7 @@ export class TrackController {
       throw new NotFoundException(`Track with ID ${id} was not found`);
   }
 
-  @UseGuards(ContentTypeGuard)
+  @UseGuards(JWTAuthorizationGuard, ContentTypeGuard)
   @Put(':id')
   async updateTrack(
     @Param(

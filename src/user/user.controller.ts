@@ -15,15 +15,18 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto, UpdatePasswordDto, SerializedUser } from './user.const';
 import { ContentTypeGuard } from 'src/common/guards/contentType.guard';
+import { JWTAuthorizationGuard } from 'src/common/guards/authorization.guard';
 @Controller('user')
 export class UserConroller {
   constructor(private readonly userService: UserService) {}
 
+  @UseGuards(JWTAuthorizationGuard)
   @Get()
   async getAllUsers(): Promise<SerializedUser[]> {
     return await this.userService.getAll();
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Get(':id')
   async getUser(
     @Param(
@@ -41,7 +44,7 @@ export class UserConroller {
     return user;
   }
 
-  @UseGuards(ContentTypeGuard)
+  @UseGuards(JWTAuthorizationGuard, ContentTypeGuard)
   @Post()
   async createUser(
     @Body() createUserDto: CreateUserDto,
@@ -49,6 +52,7 @@ export class UserConroller {
     return this.userService.create(createUserDto);
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteUser(
@@ -67,7 +71,7 @@ export class UserConroller {
       throw new NotFoundException(`User with ID ${id} was not found`);
   }
 
-  @UseGuards(ContentTypeGuard)
+  @UseGuards(JWTAuthorizationGuard, ContentTypeGuard)
   @Put(':id')
   async updateUser(
     @Param(

@@ -16,16 +16,19 @@ import { Artist } from '@prisma/client';
 import { ArtistDto } from './artist.const';
 import { ArtistService } from './artist.service';
 import { ContentTypeGuard } from 'src/common/guards/contentType.guard';
+import { JWTAuthorizationGuard } from 'src/common/guards/authorization.guard';
 
 @Controller('artist')
 export class ArtistController {
   constructor(private readonly artistService: ArtistService) {}
 
+  @UseGuards(JWTAuthorizationGuard)
   @Get()
   async getAllArtists(): Promise<Artist[]> {
     return await this.artistService.getAll();
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Get(':id')
   async getArtist(
     @Param(
@@ -44,12 +47,13 @@ export class ArtistController {
     return artist;
   }
 
-  @UseGuards(ContentTypeGuard)
+  @UseGuards(JWTAuthorizationGuard, ContentTypeGuard)
   @Post()
   async createArtist(@Body() createArtistDto: ArtistDto): Promise<Artist> {
     return await this.artistService.create(createArtistDto);
   }
 
+  @UseGuards(JWTAuthorizationGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteArtist(
@@ -68,7 +72,7 @@ export class ArtistController {
       throw new NotFoundException(`Artist with ID ${id} was not found`);
   }
 
-  @UseGuards(ContentTypeGuard)
+  @UseGuards(JWTAuthorizationGuard, ContentTypeGuard)
   @Put(':id')
   async updateArtist(
     @Param(

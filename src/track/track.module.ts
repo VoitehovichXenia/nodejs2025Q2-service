@@ -5,6 +5,7 @@ import { AlbumModule } from 'src/album/album.module';
 import { ArtistModule } from 'src/artist/artist.module';
 import { FavoritesModule } from 'src/favorite/favorite.module';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
     forwardRef(() => FavoritesModule),
   ],
   controllers: [TrackController],
-  providers: [TrackService, PrismaService],
+  providers: [TrackService, PrismaService, JwtService],
   exports: [TrackService],
 })
 export class TrackModule {}
