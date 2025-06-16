@@ -15,6 +15,6 @@ import { DEFAULT_JWT_KEY } from './auth.const';
   ],
   providers: [AuthService],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

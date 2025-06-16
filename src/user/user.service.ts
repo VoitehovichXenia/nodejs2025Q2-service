@@ -45,7 +45,7 @@ export class UserService {
     login,
     password,
   }: CreateUserDto): Promise<SerializedUser> {
-    const user = await this._users.findUnique({
+    const user = await this._users.findFirst({
       where: { login },
     });
     if (!user)

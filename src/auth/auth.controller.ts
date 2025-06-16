@@ -12,6 +12,7 @@ import { ContentTypeGuard } from 'src/common/guards/contentType.guard';
 import { CreateUserDto } from 'src/user/user.const';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
+import { TokenData } from './auth.const';
 
 @Controller('auth')
 export class AuthController {
@@ -22,17 +23,17 @@ export class AuthController {
   ) {}
 
   @UseGuards(ContentTypeGuard)
-  @Post('/signup')
+  @Post('signup')
   @HttpCode(201)
   signup(@Body() signupUserDto: CreateUserDto) {
     return this.userService.create(signupUserDto);
   }
 
   @UseGuards(ContentTypeGuard)
-  @Post('/login')
+  @Post('login')
   @HttpCode(200)
-  login(@Body() loginUserDto: CreateUserDto) {
-    return this.authService.login(loginUserDto);
+  async login(@Body() loginUserDto: CreateUserDto): Promise<TokenData> {
+    return await this.authService.login(loginUserDto);
   }
 
   @Post('/refresh')
