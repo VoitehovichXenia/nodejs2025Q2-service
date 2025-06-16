@@ -13,12 +13,14 @@
     "build": "nest build",
     "create:env": "copy .env.example .env",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "prisma:dev:init": "npx prisma generate && npx prisma migrate dev --name init",
-    "prisma:generate": "npx prisma generate",
+    "prisma:dev": "npx prisma generate && npx prisma migrate dev --name init",
+    "prisma:prod": "npx prisma generate && npx prisma migrate deploy",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
+    "db:start:dev": "npm run prisma:dev && npm run start:dev",
+    "db:start:prod": "npm run prisma:prod && npm run build && npm run start:prod",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest --testMatch \"<rootDir>/*.spec.ts\" --noStackTrace --runInBand",
     "test:auth": "cross-env TEST_MODE=auth jest --testPathIgnorePatterns refresh.e2e.spec.ts --noStackTrace --runInBand",
@@ -26,7 +28,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "scan": "docker scout cves abjektmar/home_library_app:latest & docker scout cves abjektmar/home_library_database:latest"
+    "scan": "docker scout cves abjektmar/home_library_app:latest & docker scout cves abjektmar/home_library_database:latest",
+    "docker": "docker compose -f docker-compose.yml up",
+    "docker:dev": "docker compose -f docker-compose.yml -f docker-compose.dev.yml up --watch"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.16",

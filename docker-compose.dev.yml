@@ -1,0 +1,8 @@
+services:
+  app:
+    develop:
+      watch:
+        - path: ./
+          action: sync
+          target: /app
+    entrypoint: "npm run db:start:dev"

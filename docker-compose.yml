@@ -2,7 +2,7 @@ version: '3.9'
 
 services:
   database:
-    image: abjektmar/home_library_database:latest
+    # image: abjektmar/home_library_database:latest
     build:
       context: ./docker/postgres
     container_name: home_library_database
@@ -15,9 +15,10 @@ services:
       - home_library_network
     volumes:
       - database_data:/var/lib/postgresql/data
+      - database_logs:/var/log/postgresql/
   
   app:
-    image: abjektmar/home_library_app:latest
+    # image: abjektmar/home_library_app:latest
     build: 
       context: .
       dockerfile: ./docker/app/Dockerfile
@@ -38,4 +39,5 @@ networks:
 
 volumes:
   database_data:
+  database_logs:
     
