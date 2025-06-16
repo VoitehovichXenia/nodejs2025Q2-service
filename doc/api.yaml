@@ -117,6 +117,119 @@ security:
   - bearerAuth: []
 
 paths:
+  /auth/login:
+    post:
+      tags:
+        - Login
+      security: []
+      summary: Login
+      description: Logins a user and returns a JWT-token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              title: example
+              properties:
+                login:
+                  type: string
+                  description: Username
+                password:
+                  type: string
+                  description: Password
+              required:
+                - user
+                - login
+      responses:
+        200:
+          description: Successful login.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+                description: JWT Token
+        400:
+          description: Login or password is missing, or they are not a strings
+        403:
+          description: Incorrect login or password
+  /auth/signup:
+    post:
+      tags:
+        - Signup
+      security: [ ]
+      summary: Signup
+      description: Signup a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              title: example
+              properties:
+                login:
+                  type: string
+                  minLength: 3
+                  maxLength: 255
+                  description: Username
+                password:
+                  type: string
+                  format: password
+                  pattern: ^[a-zA-Z0-9]{3,30}
+                  description: Password
+              required:
+                - login
+                - password
+      responses:
+        201:
+          description: Successful signup
+        400:
+          description: Bad request
+  /auth/refresh:
+    post:
+      tags:
+        - Login
+      security: []
+      summary: Login
+      description: Logins a user and returns a JWT-token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              title: example
+              properties:
+                refreshToken:
+                  type: string
+                  description: Username
+                  example: eyJjbGllbnRfaWQiOiJZekV6TUdkb01ISm5PSEJpT0cxaWJEaHlOVEE9IiwicmVzcG9uc2VfdHlwZSI6ImNvZGUiLCJzY29wZSI6ImludHJvc2NwZWN0X3Rva2VucywgcmV2b2tlX3Rva2VucyIsImlzcyI6ImJqaElSak0xY1hwYWEyMXpkV3RJU25wNmVqbE1iazQ0YlRsTlpqazNkWEU9
+              required:
+                - refreshToken
+      responses:
+        200:
+          description: Successful login.
+          content:
+            application/json:
+              schema:
+                schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                  refreshToken:
+                    type: string
+                description: JWT Token
+        401:
+          description: No refreshToken in body
+        403:
+          description: Incorrect login or password
   /user:
     get:
       tags:
@@ -132,6 +245,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
     post:
       tags:
         - Users
@@ -179,6 +294,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
   /user/{id}:
     parameters:
       - name: id
@@ -215,6 +332,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: User not found
           content:
@@ -295,6 +414,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         403:
           description: oldPassword is wrong
           content:
@@ -351,6 +472,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: User not found
           content:
@@ -437,6 +560,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Not Found. Artist ID or Album ID doesn't exist
           content:
@@ -489,6 +614,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Track was not found.
           content: 
@@ -581,6 +708,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Track was not found.
           content:
@@ -621,6 +750,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Track was not found.
           content:
@@ -702,6 +833,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Not Found. Artist with artist ID doesn't exist.
           content:
@@ -754,6 +887,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Album was not found.
           content:
@@ -820,6 +955,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Album was not found.
           content:
@@ -860,6 +997,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Album was not found.
           content:
@@ -935,6 +1074,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
   /artist/{id}:
     parameters:
       - name: id
@@ -971,6 +1112,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Artist was not found.
           content:
@@ -1031,6 +1174,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Artist was not found.
           content:
@@ -1071,6 +1216,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Artist was not found.
           content:
@@ -1100,6 +1247,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Favorites'
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
   /favs/track/{id}:
     parameters:
       - name: id
@@ -1132,6 +1281,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         422:
           description: Track with id doesn't exist.
           content:
@@ -1172,6 +1323,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Track was not found.
           content:
@@ -1220,6 +1373,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         422:
           description: Album with id doesn't exist.
           content:
@@ -1260,6 +1415,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Album was not found.
           content:
@@ -1308,6 +1465,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         422:
           description: Artist with id doesn't exist.
           content:
@@ -1348,6 +1507,8 @@ paths:
                   statusCode:
                     type: number
                     example: 400
+        401:
+          $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Artist was not found.
           content:
