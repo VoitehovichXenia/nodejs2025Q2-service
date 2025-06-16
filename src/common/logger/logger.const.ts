@@ -3,6 +3,7 @@ export const LOG_PREFIXES = {
   red: '\x1b[31m',
   blue: '\x1b[34m',
   yellow: '\x1b[33m',
+  purple: '\x1b[35m',
   reset: '\x1b[0m',
 } as const;
 

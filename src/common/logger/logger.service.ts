@@ -31,14 +31,20 @@ export class LoggerService implements CoreLoggerService {
     process.stdout.write(`${formatted}\n`);
   }
 
+  customLog(message: string, color: LogColors) {
+    if (this.priority >= LOG_LEVELS.indexOf('log')) {
+      this._write(`LOG: ${message}`, color);
+    }
+  }
+
   log(message: string) {
     if (this.priority >= LOG_LEVELS.indexOf('log')) {
       this._write(`LOG: ${message}`, 'blue');
     }
   }
 
-  error(message: string) {
-    this._write(`ERROR: ${message}`, 'red');
+  error(message: string, trace?: string) {
+    this._write(`ERROR: ${message}${trace ? `\n${trace}` : ''}`, 'red');
   }
 
   fatal(message: string) {

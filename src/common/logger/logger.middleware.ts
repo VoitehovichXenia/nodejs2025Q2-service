@@ -10,11 +10,13 @@ export class LoggingMiddleware implements NestMiddleware {
     const { method, query, body, originalUrl } = req;
 
     res.on('finish', () => {
-      this.logger.log(
+      this.logger.customLog(
         `REQUEST ${method} ${originalUrl}: Query: ${JSON.stringify(query)} | Body: ${JSON.stringify(body)}`,
+        'purple',
       );
-      this.logger.log(
+      this.logger.customLog(
         `RESPONSE ${method} ${originalUrl}: Status code: ${res.statusCode} | Status message: ${res.statusMessage}`,
+        'purple',
       );
     });
 

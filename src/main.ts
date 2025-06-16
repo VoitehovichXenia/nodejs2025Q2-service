@@ -6,12 +6,14 @@ import * as yaml from 'js-yaml';
 import { readFile } from 'fs/promises';
 import { AppModule } from './app.module';
 import { LoggerService } from './common/logger/logger.service';
+import { ExceptionFilter } from './common/exceptionFilter/exceptionFilter.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { logger: false });
   const logger = app.get(LoggerService);
 
   app.useLogger(logger);
+  app.useGlobalFilters(new ExceptionFilter(logger));
 
   const yamlFile = await readFile('./doc/api.yaml', 'utf8');
 
@@ -30,8 +32,22 @@ async function bootstrap() {
     }),
   );
 
+  process.on('uncaughtException', (err: Error) => {
+    logger.error('Uncaught Exception', err?.stack);
+  });
+
+  process.on('unhandledRejection', (err: unknown) => {
+    logger.error(
+      'Unhandled Rejection',
+      err instanceof Error ? err.stack : String(err),
+    );
+  });
+
   const port = process.env.PORT || 4000;
-  console.log(`Nest.js app is listening on http://localhost:${port}/`);
+  logger.customLog(
+    `Nest.js app is listening on http://localhost:${port}/`,
+    'green',
+  );
   await app.listen(port);
 }
 bootstrap();
