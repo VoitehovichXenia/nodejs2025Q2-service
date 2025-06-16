@@ -1,0 +1,117 @@
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+} from '@nestjs/common';
+import {
+  CreateUserDto,
+  PublicUser,
+  SerializedUser,
+  UpdateUserProps,
+} from './user.const';
+import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
+
+@Injectable()
+export class UserService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  private _serialize(user: PublicUser): SerializedUser {
+    return {
+      ...user,
+      createdAt: new Date(user.createdAt).getTime(),
+      updatedAt: new Date(user.updatedAt).getTime(),
+    };
+  }
+
+  private _users = this.prisma.client.user;
+
+  public async getAll(): Promise<SerializedUser[]> {
+    const users = await this._users.findMany({
+      omit: { password: true },
+    });
+    return users.map((user) => this._serialize(user));
+  }
+
+  public async getById(id: string): Promise<SerializedUser | null> {
+    const user = await this._users.findUnique({
+      where: { id },
+      omit: { password: true },
+    });
+    if (!user) return null;
+    return this._serialize(user);
+  }
+
+  public async getByLogin({
+    login,
+    password,
+  }: CreateUserDto): Promise<SerializedUser> {
+    const user = await this._users.findFirst({
+      where: { login },
+    });
+    if (!user)
+      throw new ForbiddenException("User with such login wasn't found");
+    const isPasswordsMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordsMatch)
+      throw new ForbiddenException("User's password is incorrect");
+    delete user.password;
+    return this._serialize(user);
+  }
+
+  public async create(createUserDto: CreateUserDto): Promise<SerializedUser> {
+    const createdAt = new Date();
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      Number(process.env.CRYPT_SALT) || 10,
+    );
+    const newUser = await this._users.create({
+      data: {
+        ...createUserDto,
+        password: hashedPassword,
+        version: 1,
+        createdAt,
+        updatedAt: createdAt,
+      },
+      omit: { password: true },
+    });
+    return this._serialize(newUser);
+  }
+
+  public async delete(id: string): Promise<boolean> {
+    const user = await this._users.findUnique({
+      where: { id },
+    });
+    if (!user) return false;
+    await this.prisma.user.delete({
+      where: { id },
+      omit: { password: true },
+    });
+    return true;
+  }
+
+  public async update({
+    oldPassword,
+    newPassword,
+    id,
+  }: UpdateUserProps): Promise<SerializedUser> {
+    const user = await this._users.findUnique({
+      where: { id },
+    });
+    if (!user) throw new NotFoundException(`User with ID ${id} was not found`);
+    const isPasswordsMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordsMatch)
+      throw new ForbiddenException('User password is incorect');
+    const updatedAt = new Date();
+    const updatedVersion = user.version + 1;
+    const updatedUser = await this._users.update({
+      where: { id },
+      data: {
+        updatedAt,
+        version: updatedVersion,
+        password: newPassword,
+      },
+      omit: { password: true },
+    });
+    return this._serialize(updatedUser);
+  }
+}
