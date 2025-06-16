@@ -15,7 +15,7 @@ import {
 import { TrackService } from './track.service';
 import { Track } from '@prisma/client';
 import { TrackDto } from './track.const';
-import { CheckHeaders } from 'src/common/guards/headers.guard';
+import { ContentTypeGuard } from 'src/common/guards/contentType.guard';
 
 @Controller('track')
 export class TrackController {
@@ -44,7 +44,7 @@ export class TrackController {
     return track;
   }
 
-  @UseGuards(CheckHeaders)
+  @UseGuards(ContentTypeGuard)
   @Post()
   async createTrack(@Body() createTrackDto: TrackDto): Promise<Track> {
     const newTrack = await this.trackService.create(createTrackDto);
@@ -73,7 +73,7 @@ export class TrackController {
       throw new NotFoundException(`Track with ID ${id} was not found`);
   }
 
-  @UseGuards(CheckHeaders)
+  @UseGuards(ContentTypeGuard)
   @Put(':id')
   async updateTrack(
     @Param(

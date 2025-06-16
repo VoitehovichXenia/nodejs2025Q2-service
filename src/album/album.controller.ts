@@ -15,7 +15,7 @@ import {
 import { Album } from '@prisma/client';
 import { AlbumDto } from './album.const';
 import { AlbumService } from './album.service';
-import { CheckHeaders } from 'src/common/guards/headers.guard';
+import { ContentTypeGuard } from 'src/common/guards/contentType.guard';
 
 @Controller('album')
 export class AlbumController {
@@ -44,7 +44,7 @@ export class AlbumController {
     return album;
   }
 
-  @UseGuards(CheckHeaders)
+  @UseGuards(ContentTypeGuard)
   @Post()
   async createAlbum(@Body() createAlbumDto: AlbumDto): Promise<Album> {
     const newAlbum = await this.albumService.create(createAlbumDto);
@@ -73,7 +73,7 @@ export class AlbumController {
       throw new NotFoundException(`Album with ID ${id} was not found`);
   }
 
-  @UseGuards(CheckHeaders)
+  @UseGuards(ContentTypeGuard)
   @Put(':id')
   async updateAlbum(
     @Param(

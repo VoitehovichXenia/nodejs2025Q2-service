@@ -15,7 +15,7 @@ import {
 import { Artist } from '@prisma/client';
 import { ArtistDto } from './artist.const';
 import { ArtistService } from './artist.service';
-import { CheckHeaders } from 'src/common/guards/headers.guard';
+import { ContentTypeGuard } from 'src/common/guards/contentType.guard';
 
 @Controller('artist')
 export class ArtistController {
@@ -44,7 +44,7 @@ export class ArtistController {
     return artist;
   }
 
-  @UseGuards(CheckHeaders)
+  @UseGuards(ContentTypeGuard)
   @Post()
   async createArtist(@Body() createArtistDto: ArtistDto): Promise<Artist> {
     return await this.artistService.create(createArtistDto);
@@ -68,7 +68,7 @@ export class ArtistController {
       throw new NotFoundException(`Artist with ID ${id} was not found`);
   }
 
-  @UseGuards(CheckHeaders)
+  @UseGuards(ContentTypeGuard)
   @Put(':id')
   async updateArtist(
     @Param(

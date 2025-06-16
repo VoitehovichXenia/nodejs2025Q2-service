@@ -7,15 +7,15 @@ import {
 import { Request } from 'express';
 
 @Injectable()
-export class CheckHeaders implements CanActivate {
+export class ContentTypeGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest<Request>();
-    const customHeader = request.headers['content-type'];
+    const contentTypeHeader = request.headers['content-type'];
 
-    if (!customHeader) {
+    if (!contentTypeHeader) {
       throw new BadRequestException('Missing required header: Content-Type');
     }
-    if (customHeader !== 'application/json') {
+    if (contentTypeHeader !== 'application/json') {
       throw new BadRequestException(
         'Content-Type header must be equal to application/json',
       );

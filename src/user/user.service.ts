@@ -41,6 +41,21 @@ export class UserService {
     return this._serialize(user);
   }
 
+  public async getByLogin({
+    login,
+    password,
+  }: CreateUserDto): Promise<SerializedUser> {
+    const user = await this._users.findUnique({
+      where: { login },
+    });
+    if (!user)
+      throw new ForbiddenException("User with such login wasn't found");
+    if (user.password !== password)
+      throw new ForbiddenException("User's password is incorrect");
+    delete user.password;
+    return this._serialize(user);
+  }
+
   public async create(createUserDto: CreateUserDto): Promise<SerializedUser> {
     const createdAt = new Date();
     const newUser = await this._users.create({
