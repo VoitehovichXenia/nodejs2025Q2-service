@@ -1,21 +1,36 @@
 import {
   Injectable,
   LoggerService as CoreLoggerService,
-  LogLevel,
   LOG_LEVELS,
 } from '@nestjs/common';
 import { LOG_PREFIXES, LogColors } from './logger.const';
+import { mkdir } from 'node:fs/promises';
+import { Writable } from 'node:stream';
+import { join } from 'node:path';
+import { createStream } from 'rotating-file-stream';
 
 @Injectable()
 export class LoggerService implements CoreLoggerService {
-  private level: LogLevel;
-  private priority: number;
+  private _ws: Writable;
+  private _priority: number;
 
   constructor() {
-    const logLevel = process.env.LOG_LEVEL || 'log';
-    const priorityIndex = LOG_LEVELS.indexOf(logLevel as LogLevel);
-    this.level = logLevel as LogLevel;
-    this.priority = priorityIndex;
+    let logLevel = parseInt(process.env.LOG_LEVEL);
+    if (isNaN(logLevel)) {
+      logLevel = 3;
+    }
+    this._priority = logLevel;
+
+    const logsDir = join(process.cwd(), 'logs');
+    mkdir(logsDir, { recursive: true }).then(() => {
+      const size = process.env.LOG_FILE_SIZE_KB || '100';
+      this._ws = createStream('app.log', {
+        size: `${size}K`,
+        interval: '1d',
+        path: logsDir,
+        compress: 'gzip',
+      });
+    });
   }
 
   private _formatOutput(color: LogColors, text: string) {
@@ -29,16 +44,17 @@ export class LoggerService implements CoreLoggerService {
       `[Home library ${date.toLocaleDateString()} ${date.toLocaleTimeString()}] ${message}`,
     );
     process.stdout.write(`${formatted}\n`);
+    this._ws.write(`${formatted}\n`);
   }
 
   customLog(message: string, color: LogColors) {
-    if (this.priority >= LOG_LEVELS.indexOf('log')) {
+    if (this._priority >= LOG_LEVELS.indexOf('log')) {
       this._write(`LOG: ${message}`, color);
     }
   }
 
   log(message: string) {
-    if (this.priority >= LOG_LEVELS.indexOf('log')) {
+    if (this._priority >= LOG_LEVELS.indexOf('log')) {
       this._write(`LOG: ${message}`, 'blue');
     }
   }
@@ -52,19 +68,19 @@ export class LoggerService implements CoreLoggerService {
   }
 
   warn(message: string) {
-    if (this.priority >= LOG_LEVELS.indexOf('warn')) {
+    if (this._priority >= LOG_LEVELS.indexOf('warn')) {
       this._write(`WARN: ${message}`, 'yellow');
     }
   }
 
   debug(message: string) {
-    if (this.priority >= LOG_LEVELS.indexOf('debug')) {
+    if (this._priority >= LOG_LEVELS.indexOf('debug')) {
       this._write(`DEBUG: ${message}`, 'green');
     }
   }
 
   verbose(message: string) {
-    if (this.priority >= LOG_LEVELS.indexOf('verbose')) {
+    if (this._priority >= LOG_LEVELS.indexOf('verbose')) {
       this._write(`VERBOSE: ${message}`, 'blue');
     }
   }
