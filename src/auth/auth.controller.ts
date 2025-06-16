@@ -4,15 +4,14 @@ import {
   forwardRef,
   HttpCode,
   Inject,
-  NotFoundException,
   Post,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { ContentTypeGuard } from 'src/common/guards/contentType.guard';
-import { CreateUserDto } from 'src/user/user.const';
 import { UserService } from 'src/user/user.service';
 import { AuthService } from './auth.service';
-import { TokenData } from './auth.const';
+import { LoginDto, RefreshDto, TokenData } from './auth.const';
 
 @Controller('auth')
 export class AuthController {
@@ -24,21 +23,22 @@ export class AuthController {
 
   @UseGuards(ContentTypeGuard)
   @Post('signup')
-  @HttpCode(201)
-  signup(@Body() signupUserDto: CreateUserDto) {
-    return this.userService.create(signupUserDto);
+  signup(@Body() signupDto: LoginDto) {
+    return this.userService.create(signupDto);
   }
 
   @UseGuards(ContentTypeGuard)
   @Post('login')
   @HttpCode(200)
-  async login(@Body() loginUserDto: CreateUserDto): Promise<TokenData> {
-    return await this.authService.login(loginUserDto);
+  async login(@Body() loginDto: LoginDto): Promise<TokenData> {
+    return await this.authService.login(loginDto);
   }
 
-  @Post('/refresh')
-  refresh() {
-    // TODO
-    throw new NotFoundException();
+  @Post('refresh')
+  @HttpCode(200)
+  async refreshToken(@Body() refreshDto: RefreshDto) {
+    if (!refreshDto || !refreshDto.refreshToken)
+      throw new UnauthorizedException('Refresh token should be provided');
+    return await this.authService.refresh(refreshDto);
   }
 }
