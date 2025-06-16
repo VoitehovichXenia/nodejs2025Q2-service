@@ -10,6 +10,7 @@ import {
   UpdateUserProps,
 } from './user.const';
 import { PrismaService } from 'src/prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -50,7 +51,8 @@ export class UserService {
     });
     if (!user)
       throw new ForbiddenException("User with such login wasn't found");
-    if (user.password !== password)
+    const isPasswordsMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordsMatch)
       throw new ForbiddenException("User's password is incorrect");
     delete user.password;
     return this._serialize(user);
@@ -58,9 +60,14 @@ export class UserService {
 
   public async create(createUserDto: CreateUserDto): Promise<SerializedUser> {
     const createdAt = new Date();
+    const hashedPassword = await bcrypt.hash(
+      createUserDto.password,
+      Number(process.env.CRYPT_SALT) || 10,
+    );
     const newUser = await this._users.create({
       data: {
         ...createUserDto,
+        password: hashedPassword,
         version: 1,
         createdAt,
         updatedAt: createdAt,
@@ -91,7 +98,8 @@ export class UserService {
       where: { id },
     });
     if (!user) throw new NotFoundException(`User with ID ${id} was not found`);
-    if (user.password !== oldPassword)
+    const isPasswordsMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isPasswordsMatch)
       throw new ForbiddenException('User password is incorect');
     const updatedAt = new Date();
     const updatedVersion = user.version + 1;
