@@ -5,9 +5,13 @@ import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import * as yaml from 'js-yaml';
 import { readFile } from 'fs/promises';
 import { AppModule } from './app.module';
+import { LoggerService } from './common/logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const logger = app.get(LoggerService);
+
+  app.useLogger(logger);
 
   const yamlFile = await readFile('./doc/api.yaml', 'utf8');
 

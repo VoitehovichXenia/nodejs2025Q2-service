@@ -7,6 +7,7 @@ import { FavoritesModule } from './favorite/favorite.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { LoggerService } from './common/logger/logger.service';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [LoggerService],
+  exports: [LoggerService],
 })
 export class AppModule {}
