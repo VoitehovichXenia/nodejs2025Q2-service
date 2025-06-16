@@ -29,7 +29,10 @@ export class AuthService {
   ): Promise<string> {
     const jwtPayload = { userId: user.id, login: user.login };
     return await this.jwtService.signAsync(jwtPayload, {
-      expiresIn: type === 'access' ? ACCESS_TOKEN_EXPIRE : REFRESH_TOKEN_EXPIRE,
+      expiresIn:
+        type === 'access'
+          ? process.env.TOKEN_EXPIRE_TIME || ACCESS_TOKEN_EXPIRE
+          : process.env.TOKEN_REFRESH_EXPIRE_TIME || REFRESH_TOKEN_EXPIRE,
     });
   }
 
